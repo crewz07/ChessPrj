@@ -1,5 +1,8 @@
 package chess;
 
+// right now, pawns can't take pieces, so that needs to be fixed
+// eventually
+
 public class Pawn extends ChessPiece {
 
 	public Pawn(Player player) {

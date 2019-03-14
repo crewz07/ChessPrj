@@ -22,7 +22,9 @@ public abstract class ChessPiece implements IChessPiece {
 			return false;
 		}
 		if(board[move.toRow][move.toColumn] != null) {
-			return false;
+		    if(board[move.toRow][move.toColumn].player() == this.player()) {
+                return false;
+            }
 		}
 		return true;
 	}
