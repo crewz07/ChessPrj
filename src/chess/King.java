@@ -1,9 +1,18 @@
 package chess;
 
+import java.util.ArrayList;
+
 public class King extends ChessPiece {
+
+	int[] rowMod = new int[] {-1,0,1,1,1,0,-1,-1};
+	int[] colMod = new int[] {-1,-1,-1,0,1,1,1,0};
+
+
 
 	public King(Player player) {
 		super(player);
+
+
 	}
 
 	public String type() {
@@ -11,8 +20,49 @@ public class King extends ChessPiece {
 	}
 	
 	public boolean isValidMove(Move move, IChessPiece[][] board) {
-		boolean valid = true;
-        // More code is needed
+		boolean valid = false;
+		ArrayList<int[]> validMoves = new ArrayList<int[]>();
+
+		//go through all possible moves the king could make
+		for(int i = 0; i < 8; i++) {
+
+			if (move.fromRow + rowMod[i] > -1 &&
+					move.fromRow + rowMod[i] < 8 &&
+					move.fromColumn + colMod[i] > -1 &&
+					move.fromColumn + colMod[i] < 8) {
+				if (board[
+						move.fromRow + rowMod[i]]
+						[move.fromColumn + colMod[i]] == null) {
+
+					//if would put into check, do not allow step 10, might be model level...
+					int[] a = {
+							move.fromRow + rowMod[i],
+							move.fromColumn + colMod[i]};
+					validMoves.add(a);
+				} else if (board[
+						move.fromRow + rowMod[i]]
+						[move.fromColumn + colMod[i]].player() != this.player()) {
+
+					//if would put into check, do not allow step 10, might be model level...
+					int[] a = {
+							move.fromRow + rowMod[i],
+							move.fromColumn + colMod[i]};
+					validMoves.add(a);
+				}
+			}
+		}
+
+		for(int i = 0; i < validMoves.size(); i++){
+			int[] a = validMoves.get(i);
+			if(move.toRow == a[0] && move.toColumn == a[1]){
+				valid = true;
+			}
+		}
+
+
+		if(!super.isValidMove(move,board))
+			valid = false;
+
 		return valid;
 	}
 }
