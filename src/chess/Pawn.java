@@ -23,12 +23,27 @@ public class Pawn extends ChessPiece {
 		}
 
 		// pawns can't move horizontally
-		if(move.fromColumn != move.toColumn) {
-			return false;
-		}
+
 
 		// black pawns and white pawns will have different rules
 		if(player() == Player.WHITE) {
+			if(move.toRow == move.fromRow - 1 && move.toColumn == move.fromColumn - 1) {
+				if (board[move.toRow][move.toColumn] != null) {
+					if (board[move.toRow][move.toColumn].player() != Player.WHITE) {
+						return true;
+					}
+				}
+			}
+			if(move.toRow == move.fromRow - 1 && move.toColumn == move.fromColumn + 1) {
+				if (board[move.toRow][move.toColumn] != null) {
+					if (board[move.toRow][move.toColumn].player() != Player.WHITE) {
+						return true;
+					}
+				}
+			}
+			if(move.fromColumn != move.toColumn) {
+				return false;
+			}
 
 			// pawns can't move backwards
 			if(move.fromRow < move.toRow) {
@@ -65,7 +80,23 @@ public class Pawn extends ChessPiece {
 		// black pawns have the similar rules, but can only move in the
 		// opposite direction of white pawns
 		else {
-
+			if(move.toRow == move.fromRow + 1 && move.toColumn == move.fromColumn - 1) {
+				if (board[move.toRow][move.toColumn] != null) {
+					if (board[move.toRow][move.toColumn].player() != Player.BLACK) {
+						return true;
+					}
+				}
+			}
+			if(move.toRow == move.fromRow + 1 && move.toColumn == move.fromColumn + 1) {
+				if (board[move.toRow][move.toColumn] != null) {
+					if (board[move.toRow][move.toColumn].player() != Player.BLACK) {
+						return true;
+					}
+				}
+			}
+			if(move.fromColumn != move.toColumn) {
+				return false;
+			}
 			// pawns can't move backwards
 			if(move.fromRow > move.toRow) {
 				return false;
