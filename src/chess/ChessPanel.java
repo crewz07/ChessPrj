@@ -173,6 +173,25 @@ public class ChessPanel extends JPanel {
                         board[r][c].setIcon(wKing);
 
                 }
+                else if (model.pieceAt(r, c).player() == Player.BLACK) {
+                    if (model.pieceAt(r, c).type().equals("Pawn"))
+                        board[r][c].setIcon(bPawn);
+
+                    if (model.pieceAt(r, c).type().equals("Rook"))
+                        board[r][c].setIcon(bRook);
+
+                    if (model.pieceAt(r, c).type().equals("Knight"))
+                        board[r][c].setIcon(bKnight);
+
+                    if (model.pieceAt(r, c).type().equals("Bishop"))
+                        board[r][c].setIcon(bBishop);
+
+                    if (model.pieceAt(r, c).type().equals("Queen"))
+                        board[r][c].setIcon(bQueen);
+
+                    if (model.pieceAt(r, c).type().equals("King"))
+                        board[r][c].setIcon(bKing);
+                }
         }
         repaint();
     }
@@ -184,7 +203,12 @@ public class ChessPanel extends JPanel {
                 for (int c = 0; c < model.numColumns(); c++)
                     if (board[r][c] == event.getSource()) {
                             if (firstClickFlag == true) {
+
+                                //make sure it is actually a piece
                                 if(model.pieceAt(r,c) != null) {
+
+                                    //make sure it is that pieces turn
+
                                     fromRow = r;
                                     fromCol = c;
                                     firstClickFlag = false;
