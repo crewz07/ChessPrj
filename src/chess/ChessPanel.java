@@ -27,7 +27,7 @@ public class ChessPanel extends JPanel {
     private ImageIcon bPawn;
     private ImageIcon bKnight;
 
-    private boolean firstTurnFlag;
+    private boolean firstClickFlag;
     private int fromRow;
     private int toRow;
     private int fromCol;
@@ -64,7 +64,7 @@ public class ChessPanel extends JPanel {
         add(boardpanel, BorderLayout.WEST);
         boardpanel.setPreferredSize(new Dimension(600, 600));
         add(buttonpanel);
-        firstTurnFlag = true;
+        firstClickFlag = true;
     }
 
     private void setBackGroundColor(int r, int c) {
@@ -133,14 +133,14 @@ public class ChessPanel extends JPanel {
         // Sets the Image for white player pieces
         String path = "src/chess/";
         wRook = new ImageIcon(path + "wRook.png");
-        wBishop = new ImageIcon(path +"wBishop.png");
-        wQueen = new ImageIcon(path +"wQueen.png");
+        wBishop = new ImageIcon(path + "wBishop.png");
+        wQueen = new ImageIcon(path + "wQueen.png");
         wKing = new ImageIcon(path + "wKing.png");
         wPawn = new ImageIcon(path + "wPawn.png");
         wKnight = new ImageIcon(path + "wKnight.png");
         bRook = new ImageIcon(path + "bRook.png");
-        bBishop = new ImageIcon(path +"bBishop.png");
-        bQueen = new ImageIcon(path +"bQueen.png");
+        bBishop = new ImageIcon(path + "bBishop.png");
+        bQueen = new ImageIcon(path + "bQueen.png");
         bKing = new ImageIcon(path + "bKing.png");
         bPawn = new ImageIcon(path + "bPawn.png");
         bKnight = new ImageIcon(path + "bKnight.png");
@@ -153,8 +153,7 @@ public class ChessPanel extends JPanel {
             for (int c = 0; c < 8; c++)
                 if (model.pieceAt(r, c) == null)
                     board[r][c].setIcon(null);
-                else
-                if (model.pieceAt(r, c).player() == Player.WHITE) {
+                else if (model.pieceAt(r, c).player() == Player.WHITE) {
                     if (model.pieceAt(r, c).type().equals("Pawn"))
                         board[r][c].setIcon(wPawn);
 
@@ -183,20 +182,26 @@ public class ChessPanel extends JPanel {
         public void actionPerformed(ActionEvent event) {
             for (int r = 0; r < model.numRows(); r++)
                 for (int c = 0; c < model.numColumns(); c++)
-                    if (board[r][c] == event.getSource())
-                        if (firstTurnFlag == true) {
-                            fromRow = r;
-                            fromCol = c;
-                            firstTurnFlag = false;
-                        } else {
-                            toRow = r;
-                            toCol = c;
-                            firstTurnFlag = true;
-                            Move m = new Move(fromRow, fromCol, toRow, toCol);
-                            if ((model.isValidMove(m)) == true) {
-                                model.move(m);
-                                displayBoard();
+                    if (board[r][c] == event.getSource()) {
+                            if (firstClickFlag == true) {
+                                if(model.pieceAt(r,c) != null) {
+                                    fromRow = r;
+                                    fromCol = c;
+                                    firstClickFlag = false;
+                                }
                             }
+                            else {
+                                toRow = r;
+                                toCol = c;
+                                firstClickFlag = true;
+                                Move m = new Move(
+                                        fromRow, fromCol, toRow, toCol);
+                                if ((model.isValidMove(m)) == true) {
+                                    model.move(m);
+                                    displayBoard();
+                                }
+                            }
+
                         }
         }
     }
