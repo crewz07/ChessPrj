@@ -104,6 +104,7 @@ public class Pawn extends ChessPiece {
 		}
 
 		// i'll need to add rules for en passants later on
+		//i think this will take place in the model not in this
 	}
 }
 
