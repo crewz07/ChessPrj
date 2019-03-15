@@ -15,31 +15,36 @@ public class Bishop extends ChessPiece {
 	
 	public boolean isValidMove(Move move, IChessPiece[][] board) {
 
-	    //initialize comparitor values
-        int startingRow = move.fromRow;
-        int startingCol = move.fromColumn;
-        int boardEdgeMax = 7;
-        int boardEdgeMin = 0;
-
         //arrayList will hold 1 dimensional arrays with valid moves.
         //each array will have following format [row,col]
-        //this will allow for us to find all the moves, then move
-        //check to see if move if valid
+        //method call possibleMoves populates arrayList
+        //check to see if move is valid
         ArrayList<int[]> validMoves = new ArrayList<int[]>();
-        this.possibleMoves(startingRow,startingCol,board,validMoves);
+        boolean valid = false;
+        this.possibleMoves(move.fromRow,move.fromColumn,board,validMoves);
         for(int i = 0; i < validMoves.size(); i++){
             int[] a = validMoves.get(i);
             if(move.toRow == a[0] && move.toColumn == a[1]){
-                return true;
+                valid = true;
             }
 
         }
-        return false;
-
-        // More code is needed
+        return valid;
 		
 	}
-    private void possibleMoves(int startingRow,int startingCol,IChessPiece[][] board,ArrayList validMoves) {
+
+    /******************************************************************
+     * Used to populate arraylist of all possible moves a bishop can
+     * make from its current position, adds array to array list
+     * with format [row,col]
+     * @param startingRow integer starting row position of bishop
+     * @param startingCol integer starting col position of bishop
+     * @param board double array of chess piece locations
+     * @param validMoves array list to be populated with valid row/col
+     */
+    private void possibleMoves(int startingRow,int startingCol,
+                               IChessPiece[][] board,
+                               ArrayList validMoves) {
         //valid moves in upper left diagonal
         //start at starting place-1-1, move up to left(toward 0,0)
         for (int row = startingRow - 1, col = startingCol - 1;
