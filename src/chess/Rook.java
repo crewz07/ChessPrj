@@ -17,6 +17,7 @@ public class Rook extends ChessPiece {
 	// determines if the move is valid for a rook piece
 	public boolean isValidMove(Move move, IChessPiece[][] board) {
 		// check the baseline rules for a valid chess piece move
+		//idk if we need to do this-ak
 		if(!super.isValidMove(move, board)) {
 			return false;
 		}

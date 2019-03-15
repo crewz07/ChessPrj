@@ -18,7 +18,8 @@ public abstract class ChessPiece implements IChessPiece {
 		if ((move.fromRow == move.toRow) && (move.fromColumn == move.toColumn)) {
 			return false;
 		}
-		if(board[move.fromRow][move.fromColumn] != this) {
+		if(board[move.fromRow][move.fromColumn] != this &&
+				!(board[move.fromRow][move.fromColumn] instanceof Queen)) {
 			return false;
 		}
 		if(board[move.toRow][move.toColumn] != null) {
