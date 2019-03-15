@@ -208,10 +208,12 @@ public class ChessPanel extends JPanel {
                                 if(model.pieceAt(r,c) != null) {
 
                                     //make sure it is that pieces turn
-
-                                    fromRow = r;
-                                    fromCol = c;
-                                    firstClickFlag = false;
+                                    if (model.pieceAt(r, c).player()
+                                            == model.currentPlayer()) {
+                                        fromRow = r;
+                                        fromCol = c;
+                                        firstClickFlag = false;
+                                    }
                                 }
                             }
                             else {
@@ -221,7 +223,12 @@ public class ChessPanel extends JPanel {
                                 Move m = new Move(
                                         fromRow, fromCol, toRow, toCol);
                                 if ((model.isValidMove(m)) == true) {
+
+                                    //move piece now that its valid
                                     model.move(m);
+
+                                    //update whos turn it is
+                                    model.setNextPlayer();
                                     displayBoard();
                                 }
                             }
