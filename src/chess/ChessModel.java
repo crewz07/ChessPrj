@@ -47,14 +47,16 @@ public class ChessModel implements IChessModel {
 		boolean valid = false;
 
 		if (board[move.fromRow][move.fromColumn] != null)
-			if (board[move.fromRow][move.fromColumn].isValidMove(move, board) == true)
-                return true;
+			if (board[move.fromRow][move.fromColumn]
+					.isValidMove(move, board) == true)
+                valid = true;
 
 		return valid;
 	}
 
 	public void move(Move move) {
-		board[move.toRow][move.toColumn] =  board[move.fromRow][move.fromColumn];
+		board[move.toRow][move.toColumn] =
+                board[move.fromRow][move.fromColumn];
 		board[move.fromRow][move.fromColumn] = null;
 	}
 

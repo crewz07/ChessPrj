@@ -19,15 +19,16 @@ public class Bishop extends ChessPiece {
         //each array will have following format [row,col]
         //method call possibleMoves populates arrayList
         //check to see if move is valid
-        ArrayList<int[]> validMoves = new ArrayList<int[]>();
+        ArrayList<int[]> validMoves = new ArrayList<>();
         boolean valid = false;
         this.possibleMoves(move.fromRow,move.fromColumn,board,validMoves);
+
+        //check if move is part of possibleMoves
         for(int i = 0; i < validMoves.size(); i++){
             int[] a = validMoves.get(i);
             if(move.toRow == a[0] && move.toColumn == a[1]){
                 valid = true;
             }
-
         }
         return valid;
 		
