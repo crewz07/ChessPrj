@@ -59,11 +59,11 @@ public class ChessModel implements IChessModel {
 	 * [white L, white R, black L, black right]
 	 * @return int[] used to determine what push buttons to enable
 	 *****************************************************************/
-	public int[] castleEnable(){
-		int lWhiteState = 0;
-		int rWhiteState = 0;
-		int lBlackState = 0;
-		int rBlackState = 0;
+	public boolean[] castleEnable(){
+		boolean lWhiteState = false;
+		boolean rWhiteState = false;
+		boolean lBlackState = false;
+		boolean rBlackState = false;
 
 		//check conditions for white
 
@@ -74,7 +74,7 @@ public class ChessModel implements IChessModel {
 				if(!lwRookMoved){
 					if(board[7][1] == null &&
 							board[7][2] == null){
-						lWhiteState = 1;
+						lWhiteState = true;
 					}
 				}
 
@@ -83,7 +83,7 @@ public class ChessModel implements IChessModel {
 					if(board[7][4] == null &&
 					board[7][5] == null &&
 					board[7][6] == null){
-						rWhiteState = 1;
+						rWhiteState = true;
 					}
 				}
 			}
@@ -97,7 +97,7 @@ public class ChessModel implements IChessModel {
 			if(!lbRookMoved){
 				if(board[0][1] == null &&
 						board[0][2] == null){
-					lBlackState = 1;
+					lBlackState = true;
 				}
 			}
 
@@ -106,12 +106,12 @@ public class ChessModel implements IChessModel {
 				if(board[0][4] == null &&
 						board[0][5] == null &&
 						board[0][6] == null){
-					rBlackState = 1;
+					rBlackState = true;
 				}
 			}
 		}
 
-		int[] results = {
+		boolean[] results = {
 				lWhiteState,
 				rWhiteState,
 				lBlackState,
