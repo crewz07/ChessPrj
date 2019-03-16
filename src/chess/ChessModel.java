@@ -5,6 +5,13 @@ public class ChessModel implements IChessModel {
 	private Player player;
 	private int numRows = 8;
 	private int numColumns = 8;
+
+	private boolean wKingMoved;
+	private boolean bKingMoved;
+	private boolean rbRookMoved;
+	private boolean lbRookMoved;
+	private boolean rwRookMoved;
+	private boolean lwRookMoved;
 	// declare other instance variables as needed
 
 	public ChessModel() {
@@ -36,6 +43,80 @@ public class ChessModel implements IChessModel {
 		for(int i = 0; i < numColumns; i++) {
 			board[1][i] = new Pawn(Player.BLACK);
 		}
+
+		wKingMoved = false;
+		bKingMoved = false;
+		rbRookMoved = false;
+		lbRookMoved = false;
+		rwRookMoved = false;
+		lwRookMoved = false;
+	}
+
+	/******************************************************************
+	 * Used to check state on castling conditions, returns an integer
+	 * to be used by gui to determine which buttons should be enabled
+	 * return array format is as follows 1 for enable 0 for disabled
+	 * [white L, white R, black L, black right]
+	 * @return int[] used to determine what push buttons to enable
+	 *****************************************************************/
+	public int[] castleEnable(){
+		int lWhiteState = 0;
+		int rWhiteState = 0;
+		int lBlackState = 0;
+		int rBlackState = 0;
+
+		//check conditions for white
+
+		//if king has not moved
+			if(!wKingMoved){
+
+				//if lRook has not moved and pieces empty enable castle
+				if(!lwRookMoved){
+					if(board[7][1] == null &&
+							board[7][2] == null){
+						lWhiteState = 1;
+					}
+				}
+
+				//if rRook has not moved and pieces empty enable castle
+				if(!rwRookMoved){
+					if(board[7][4] == null &&
+					board[7][5] == null &&
+					board[7][6] == null){
+						rWhiteState = 1;
+					}
+				}
+			}
+
+		//check conditions for black
+
+		//if king has not moved
+		if(!bKingMoved){
+
+			//if lRook has not moved and pieces empty enable castle
+			if(!lbRookMoved){
+				if(board[0][1] == null &&
+						board[0][2] == null){
+					lBlackState = 1;
+				}
+			}
+
+			//if rRook has not moved and pieces empty enable castle
+			if(!rbRookMoved){
+				if(board[0][4] == null &&
+						board[0][5] == null &&
+						board[0][6] == null){
+					rBlackState = 1;
+				}
+			}
+		}
+
+		int[] results = {
+				lWhiteState,
+				rWhiteState,
+				lBlackState,
+				rBlackState};
+		return results;
 	}
 
 	public boolean isComplete() {

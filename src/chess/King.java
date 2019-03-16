@@ -18,7 +18,8 @@ public class King extends ChessPiece {
 	public String type() {
 		return "King";
 	}
-	
+
+	//still need to add castleing
 	public boolean isValidMove(Move move, IChessPiece[][] board) {
 		boolean valid = false;
 		ArrayList<int[]> validMoves = new ArrayList<int[]>();
@@ -41,7 +42,8 @@ public class King extends ChessPiece {
 					validMoves.add(a);
 				} else if (board[
 						move.fromRow + rowMod[i]]
-						[move.fromColumn + colMod[i]].player() != this.player()) {
+						[move.fromColumn + colMod[i]].player() !=
+						this.player()) {
 
 					//if would put into check, do not allow step 10, might be model level...
 					int[] a = {
