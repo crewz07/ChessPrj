@@ -6,12 +6,13 @@ public class ChessModel implements IChessModel {
 	private int numRows = 8;
 	private int numColumns = 8;
 
-	private boolean wKingMoved;
-	private boolean bKingMoved;
-	private boolean rbRookMoved;
-	private boolean lbRookMoved;
-	private boolean rwRookMoved;
-	private boolean lwRookMoved;
+	public boolean wKingMoved;
+	public boolean bKingMoved;
+	public boolean rbRookMoved;
+	public boolean lbRookMoved;
+	public boolean rwRookMoved;
+	public boolean lwRookMoved;
+
 	// declare other instance variables as needed
 
 	public ChessModel() {
