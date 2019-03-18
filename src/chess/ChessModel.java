@@ -137,6 +137,49 @@ public class ChessModel implements IChessModel {
 	}
 
 	public void move(Move move) {
+
+		if(board[move.fromRow][move.fromColumn] instanceof King){
+			if(board[move.fromRow][move.fromColumn].player() ==
+					Player.WHITE){
+				wKingMoved = true;
+			}
+			else{
+				bKingMoved = true;
+			}
+		}
+
+		//if it was a rook that moved,
+		else if(board[move.fromRow][move.fromColumn] instanceof Rook){
+
+			//if it was a white pieces turn
+			if(board[move.fromRow][move.fromColumn].player() ==
+					Player.WHITE){
+
+				//if it was left rook
+				if(move.fromColumn == 0){
+					lwRookMoved = true;
+				}
+
+				//if it was right rook
+				else if(move.fromColumn == 7){
+					rwRookMoved = true;
+				}
+			}
+
+			//black piece moved
+			else{
+				//if it was left rook
+				if(move.fromColumn == 0){
+					lbRookMoved = true;
+				}
+
+				//if it was right rook
+				else if(move.fromColumn == 7){
+					rbRookMoved = true;
+				}
+			}
+		}
+
 		board[move.toRow][move.toColumn] =
                 board[move.fromRow][move.fromColumn];
 		board[move.fromRow][move.fromColumn] = null;
