@@ -4,14 +4,15 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-// the code here could be more organized, but for now it's at least sort of
-// functional, the white pawns, rooks, and knights all function as they should,
-// all the other pieces still need to be worked on
-
 public class ChessPanel extends JPanel {
 
     private JButton[][] board;
     private ChessModel model;
+
+    private JButton wCastleLeft = new JButton();
+    private JButton wCastleRight = new JButton();
+    private JButton bCastleLeft = new JButton();
+    private JButton bCastleRight = new JButton();
 
     private ImageIcon wRook;
     private ImageIcon wBishop;
@@ -32,18 +33,20 @@ public class ChessPanel extends JPanel {
     private int toRow;
     private int fromCol;
     private int toCol;
-    // declare other intance variables as needed
 
     private listener listener;
+
+    private int lastClickedRow;
+    private int lastClickedColumn;
 
     public ChessPanel() {
         model = new ChessModel();
         board = new JButton[model.numRows()][model.numColumns()];
         listener = new listener();
         createIcons();
+        setLayout(new GridBagLayout());
 
         JPanel boardpanel = new JPanel();
-        JPanel buttonpanel = new JPanel();
         boardpanel.setLayout(new GridLayout(model.numRows(), model.numColumns(), 1, 1));
 
         for (int r = 0; r < model.numRows(); r++) {
@@ -61,9 +64,47 @@ public class ChessPanel extends JPanel {
                 boardpanel.add(board[r][c]);
             }
         }
-        add(boardpanel, BorderLayout.WEST);
+
+        // set the preferred size of the castling buttons
+        wCastleRight.setPreferredSize(new Dimension(25, 25));
+        bCastleLeft.setPreferredSize(new Dimension(25, 25));
+        wCastleLeft.setPreferredSize(new Dimension(25, 25));
+        bCastleRight.setPreferredSize(new Dimension(25, 25));
+
+        // create the constraints object for the gridbaglayout
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        // position and set the size of the boardpanel
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        add(boardpanel, gbc);
         boardpanel.setPreferredSize(new Dimension(600, 600));
-        add(buttonpanel);
+
+        // position the right castling buttons
+        gbc.insets = new Insets(25, 25, 25, 25);
+        gbc.gridx = 2;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        add(wCastleRight, gbc);
+        gbc.anchor = GridBagConstraints.NORTH;
+        add(bCastleRight, gbc);
+
+        // position the left castling buttons
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.SOUTH;
+        add(wCastleLeft, gbc);
+        gbc.anchor = GridBagConstraints.NORTH;
+        add(bCastleLeft, gbc);
+
+        // add action listeners to the castling buttons
+        wCastleRight.addActionListener(listener);
+        wCastleLeft.addActionListener(listener);
+        bCastleRight.addActionListener(listener);
+        bCastleLeft.addActionListener(listener);
+
+        // disable the black castling buttons
+        bCastleRight.setEnabled(false);
+        bCastleLeft.setEnabled(false);
+
         firstClickFlag = true;
     }
 
@@ -148,6 +189,30 @@ public class ChessPanel extends JPanel {
 
     // method that updates the board
     private void displayBoard() {
+        // determine which castling buttons will be active according to the board state and current player
+        if(model.currentPlayer() == Player.WHITE) {
+            if(!model.wKingMoved) {
+                wCastleRight.setEnabled(true);
+                wCastleLeft.setEnabled(true);
+                if(model.lwRookMoved)
+                    wCastleLeft.setEnabled(false);
+                if(model.rwRookMoved)
+                    wCastleRight.setEnabled(false);
+            }
+            bCastleRight.setEnabled(false);
+            bCastleLeft.setEnabled(false);
+        } else {
+            if(!model.bKingMoved) {
+                bCastleRight.setEnabled(true);
+                bCastleLeft.setEnabled(true);
+                if(model.lbRookMoved)
+                    bCastleLeft.setEnabled(false);
+                if(model.rbRookMoved)
+                    bCastleRight.setEnabled(false);
+            }
+            wCastleRight.setEnabled(false);
+            wCastleLeft.setEnabled(false);
+        }
 
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++)
@@ -199,6 +264,23 @@ public class ChessPanel extends JPanel {
     // inner class that represents action listener for buttons
     private class listener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
+            if(event.getSource() == wCastleRight) {
+                model.moveCastle(false);
+                displayBoard();
+            }
+            if(event.getSource() == wCastleLeft) {
+                model.moveCastle(true);
+                displayBoard();
+            }
+            if(event.getSource() == bCastleRight) {
+                model.moveCastle(false);
+                displayBoard();
+            }
+            if(event.getSource() == bCastleLeft) {
+                model.moveCastle(true);
+                displayBoard();
+            }
+
             for (int r = 0; r < model.numRows(); r++)
                 for (int c = 0; c < model.numColumns(); c++)
                     if (board[r][c] == event.getSource()) {
@@ -206,7 +288,12 @@ public class ChessPanel extends JPanel {
 
                                 //make sure it is actually a piece
                                 if(model.pieceAt(r,c) != null) {
-
+                                    // if the piece belongs to the active player, highlight the square it's on
+                                    if(model.pieceAt(r, c).player() == model.currentPlayer()) {
+                                        lastClickedRow = r;
+                                        lastClickedColumn = c;
+                                        board[r][c].setBackground(Color.PINK);
+                                    }
                                     //make sure it is that pieces turn
                                     if (model.pieceAt(r, c).player()
                                             == model.currentPlayer()) {
@@ -217,6 +304,8 @@ public class ChessPanel extends JPanel {
                                 }
                             }
                             else {
+                                // set the background color of the square selected on the first click back to a normal color
+                                setBackGroundColor(lastClickedRow, lastClickedColumn);
                                 toRow = r;
                                 toCol = c;
                                 firstClickFlag = true;
