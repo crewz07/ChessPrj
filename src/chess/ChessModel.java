@@ -67,47 +67,49 @@ public class ChessModel implements IChessModel {
 		boolean rBlackState = false;
 
 		//check conditions for white
-
-		//if king has not moved
-		if (!wKingMoved) {
-
-			//if lRook has not moved and pieces empty enable castle
-			if (!lwRookMoved) {
-				if (board[7][1] == null &&
-						board[7][2] == null) {
-					lWhiteState = true;
+		if(player == Player.WHITE) {
+			//if king has not moved
+			if (!wKingMoved) {
+				//queen side
+				//if lRook has not moved and pieces empty enable castle
+				if (!lwRookMoved) {
+					if (board[7][1] == null &&
+							board[7][2] == null &&
+							board[7][3] == null) {
+						lWhiteState = true;
+					}
 				}
-			}
 
-			//if rRook has not moved and pieces empty enable castle
-			if (!rwRookMoved) {
-				if (board[7][4] == null &&
-						board[7][5] == null &&
-						board[7][6] == null) {
-					rWhiteState = true;
+				//if rRook has not moved and pieces empty enable castle
+				if (!rwRookMoved) {
+					if (board[7][5] == null &&
+							board[7][6] == null) {
+						rWhiteState = true;
+					}
 				}
 			}
 		}
-
 		//check conditions for black
+		if(player == Player.BLACK){
+			//if king has not moved
+			if (!bKingMoved) {
 
-		//if king has not moved
-		if (!bKingMoved) {
-
-			//if lRook has not moved and pieces empty enable castle
-			if (!lbRookMoved) {
-				if (board[0][1] == null &&
-						board[0][2] == null) {
-					lBlackState = true;
+				//queen side
+				//if lRook has not moved and pieces empty enable castle
+				if (!lbRookMoved) {
+					if (board[0][1] == null &&
+							board[0][2] == null &&
+							board[0][3] == null) {
+						lBlackState = true;
+					}
 				}
-			}
 
-			//if rRook has not moved and pieces empty enable castle
-			if (!rbRookMoved) {
-				if (board[0][4] == null &&
-						board[0][5] == null &&
-						board[0][6] == null) {
-					rBlackState = true;
+				//if rRook has not moved and pieces empty enable castle
+				if (!rbRookMoved) {
+					if (board[0][5] == null &&
+							board[0][6] == null) {
+						rBlackState = true;
+					}
 				}
 			}
 		}
@@ -137,15 +139,18 @@ public class ChessModel implements IChessModel {
 				board[lrook.toRow][lrook.toColumn] =
 						board[lrook.fromRow][lrook.fromColumn];
 				board[lrook.fromRow][lrook.fromColumn] = null;
+				lwRookMoved = true;
 
 				//move king
 				board[king.toRow][king.toColumn] =
 						board[king.fromRow][king.fromColumn];
 				board[king.fromRow][king.fromColumn] = null;
+				wKingMoved = true;
+				this.setNextPlayer();
 			}
 
 			//black players turn
-			else{
+			else if(player == Player.BLACK){
 				Move lrook = new Move(0,0,0,3);
 				Move king = new Move(0,4,0,2);
 				this.move(lrook);
@@ -155,15 +160,18 @@ public class ChessModel implements IChessModel {
 				board[lrook.toRow][lrook.toColumn] =
 						board[lrook.fromRow][lrook.fromColumn];
 				board[lrook.fromRow][lrook.fromColumn] = null;
+				lbRookMoved = true;
 
 				//move king
 				board[king.toRow][king.toColumn] =
 						board[king.fromRow][king.fromColumn];
 				board[king.fromRow][king.fromColumn] = null;
+				bKingMoved = true;
+				this.setNextPlayer();
 			}
 		}
 
-		//queen side castling
+		//king side castling
 		else{
 			if(player == Player.WHITE){
 
@@ -177,21 +185,22 @@ public class ChessModel implements IChessModel {
 				board[rRook.toRow][rRook.toColumn] =
 						board[rRook.fromRow][rRook.fromColumn];
 				board[rRook.fromRow][rRook.fromColumn] = null;
+				rwRookMoved = true;
 
 				//move king
 				board[king.toRow][king.toColumn] =
 						board[king.fromRow][king.fromColumn];
 				board[king.fromRow][king.fromColumn] = null;
+				bKingMoved = true;
+				this.setNextPlayer();
 			}
 
 			//black players move
-			else{
+			else if(player == Player.BLACK){
 
 				//king side castling
 				Move rRook = new Move(0,7,0,5);
 				Move king = new Move(0,4,0,6);
-				this.move(rRook);
-				this.move(king);
 
 				//move rRook
 				board[rRook.toRow][rRook.toColumn] =
@@ -202,6 +211,7 @@ public class ChessModel implements IChessModel {
 				board[king.toRow][king.toColumn] =
 						board[king.fromRow][king.fromColumn];
 				board[king.fromRow][king.fromColumn] = null;
+				this.setNextPlayer();
 			}
 		}
 	}
