@@ -201,29 +201,6 @@ public class ChessPanel extends JPanel {
         bCastleLeft.setEnabled(castleEnable[2]);
         bCastleRight.setEnabled(castleEnable[3]);
 
-//        if(model.currentPlayer() == Player.WHITE) {
-//            if(!model.wKingMoved) {
-//                wCastleRight.setEnabled(true);
-//                wCastleLeft.setEnabled(true);
-//                if(model.lwRookMoved)
-//                    wCastleLeft.setEnabled(false);
-//                if(model.rwRookMoved)
-//                    wCastleRight.setEnabled(false);
-//            }
-//            bCastleRight.setEnabled(false);
-//            bCastleLeft.setEnabled(false);
-//        } else {
-//            if(!model.bKingMoved) {
-//                bCastleRight.setEnabled(true);
-//                bCastleLeft.setEnabled(true);
-//                if(model.lbRookMoved)
-//                    bCastleLeft.setEnabled(false);
-//                if(model.rbRookMoved)
-//                    bCastleRight.setEnabled(false);
-//            }
-//            wCastleRight.setEnabled(false);
-//            wCastleLeft.setEnabled(false);
-//        }
 
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++)
@@ -299,12 +276,14 @@ public class ChessPanel extends JPanel {
 
                                 //make sure it is actually a piece
                                 if (model.pieceAt(r, c) != null) {
+
                                     // if the piece belongs to the active player, highlight the square it's on
                                     if (model.pieceAt(r, c).player() == model.currentPlayer()) {
                                         lastClickedRow = r;
                                         lastClickedColumn = c;
                                         board[r][c].setBackground(Color.PINK);
                                     }
+
                                     //make sure it is that pieces turn
                                     if (model.pieceAt(r, c).player()
                                             == model.currentPlayer()) {
@@ -314,6 +293,7 @@ public class ChessPanel extends JPanel {
                                     }
                                 }
                             } else {
+
                                 // set the background color of the square selected on the first click back to a normal color
                                 setBackGroundColor(lastClickedRow, lastClickedColumn);
                                 toRow = r;

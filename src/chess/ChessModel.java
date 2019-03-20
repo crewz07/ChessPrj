@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.ArrayList;
+
 public class ChessModel implements IChessModel {
 	private IChessPiece[][] board;
 	private Player player;
@@ -308,6 +310,37 @@ public class ChessModel implements IChessModel {
 
 	public void setPiece(int row, int column, IChessPiece piece) {
 		board[row][column] = piece;
+	}
+
+	//finds the location of both kings, returns array list containing
+	//an integer arrays size 2 with white king first, integer array
+	//holds[row,col]
+	//arraylist return format blackKing[row,col]
+	//						  whiteKing[row,col]
+	//have to check player color to make sure you get the one you want
+	public ArrayList<int[]> findKing(){
+
+		//create arrayList
+		ArrayList<int[]> kingPositions = new ArrayList<>();
+		ArrayList<int[]> formattedkingPositions = new ArrayList<>();
+		for(int r = 0; r < numRows; r++)
+			for(int c = 0; c < numColumns; c++){
+				if(board[r][c] instanceof King){
+					int[] position = {r,c};
+					kingPositions.add(position);
+				}
+			}
+		int[] kingPosition = kingPositions.get(0);
+			if(board[kingPosition[0]][kingPosition[1]].player() ==
+					Player.WHITE){
+				formattedkingPositions.add(kingPositions.get(1));
+				formattedkingPositions.add(kingPositions.get(0));
+			}
+			else{
+				formattedkingPositions.add(kingPositions.get(0));
+				formattedkingPositions.add(kingPositions.get(1));
+			}
+		return formattedkingPositions;
 	}
 
 	public void AI() {
