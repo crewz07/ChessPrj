@@ -23,8 +23,8 @@ public class ChessModel implements IChessModel {
 		board[7][0] = new Rook(Player.WHITE);
 		board[7][1] = new Knight(Player.WHITE);
 		board[7][2] = new Bishop(Player.WHITE);
-		board[7][3] = new King(Player.WHITE);
-		board[7][4] = new Queen(Player.WHITE);
+		board[7][3] = new Queen(Player.WHITE);
+		board[7][4] = new King(Player.WHITE);
 		board[7][5] = new Bishop(Player.WHITE);
 		board[7][6] = new Knight (Player.WHITE);
 		board[7][7] = new Rook(Player.WHITE);
@@ -36,8 +36,8 @@ public class ChessModel implements IChessModel {
 		board[0][0] = new Rook(Player.BLACK);
 		board[0][1] = new Knight(Player.BLACK);
 		board[0][2] = new Bishop(Player.BLACK);
-		board[0][3] = new King(Player.BLACK);
-		board[0][4] = new Queen(Player.BLACK);
+		board[0][3] = new Queen(Player.BLACK);
+		board[0][4] = new King(Player.BLACK);
 		board[0][5] = new Bishop(Player.BLACK);
 		board[0][6] = new Knight (Player.BLACK);
 		board[0][7] = new Rook(Player.BLACK);
@@ -126,12 +126,12 @@ public class ChessModel implements IChessModel {
 	 *************************************************************/
 	public void moveCastle(boolean left){
 
-		//king side castling
+		//queen side castling
 		if(left) {
 			if(player == Player.WHITE){
 
-				Move lrook = new Move(7,0,7,2);
-				Move king = new Move(7,3,7,1);
+				Move lrook = new Move(7,0,7,3);
+				Move king = new Move(7,4,7,2);
 
 				//move lrook
 				board[lrook.toRow][lrook.toColumn] =
@@ -146,8 +146,8 @@ public class ChessModel implements IChessModel {
 
 			//black players turn
 			else{
-				Move lrook = new Move(0,0,0,2);
-				Move king = new Move(0,3,0,1);
+				Move lrook = new Move(0,0,0,3);
+				Move king = new Move(0,4,0,2);
 				this.move(lrook);
 				this.move(king);
 
@@ -167,9 +167,9 @@ public class ChessModel implements IChessModel {
 		else{
 			if(player == Player.WHITE){
 
-				//queen side castling
+				//king side castling
 				Move rRook = new Move(7,7,7,5);
-				Move king = new Move(7,3,7,6);
+				Move king = new Move(7,4,7,6);
 				this.move(rRook);
 				this.move(king);
 
@@ -187,9 +187,9 @@ public class ChessModel implements IChessModel {
 			//black players move
 			else{
 
-				//queen side castling
+				//king side castling
 				Move rRook = new Move(0,7,0,5);
-				Move king = new Move(0,3,0,6);
+				Move king = new Move(0,4,0,6);
 				this.move(rRook);
 				this.move(king);
 
