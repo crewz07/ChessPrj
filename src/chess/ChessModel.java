@@ -283,6 +283,23 @@ public class ChessModel implements IChessModel {
 	}
 
 	public boolean inCheck(Player p) {
+
+		//find king positions returned in format:
+			//blackKing[r,c]
+			//whiteKing[r,c]
+		ArrayList<int[]> formattedKingPositions = this.findKing();
+		int[] blackKingLoc = formattedKingPositions.get(0);
+		int[] whiteKingLoc = formattedKingPositions.get(1);
+
+		//META:at start of turn are you in check, yes must move out
+		//META:current player moves, did current player put themselves
+		//		into check
+
+		//check p color, check if opposing piece's isValid method can get
+		//	to p color king.
+		//if anyone can break out of loop and return true
+		//finish loop return false
+
 		boolean valid = false;
 		return valid;
 	}
