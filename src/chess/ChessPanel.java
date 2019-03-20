@@ -279,28 +279,28 @@ public class ChessPanel extends JPanel {
                 model.moveCastle(false);
                 displayBoard();
             }
-            if(event.getSource() == wCastleLeft) {
+            else if(event.getSource() == wCastleLeft) {
                 model.moveCastle(true);
                 displayBoard();
             }
-            if(event.getSource() == bCastleRight) {
+            else if(event.getSource() == bCastleRight) {
                 model.moveCastle(false);
                 displayBoard();
             }
-            if(event.getSource() == bCastleLeft) {
+            else if(event.getSource() == bCastleLeft) {
                 model.moveCastle(true);
                 displayBoard();
             }
-
-            for (int r = 0; r < model.numRows(); r++)
-                for (int c = 0; c < model.numColumns(); c++)
-                    if (board[r][c] == event.getSource()) {
+            else {
+                for (int r = 0; r < model.numRows(); r++)
+                    for (int c = 0; c < model.numColumns(); c++)
+                        if (board[r][c] == event.getSource()) {
                             if (firstClickFlag == true) {
 
                                 //make sure it is actually a piece
-                                if(model.pieceAt(r,c) != null) {
+                                if (model.pieceAt(r, c) != null) {
                                     // if the piece belongs to the active player, highlight the square it's on
-                                    if(model.pieceAt(r, c).player() == model.currentPlayer()) {
+                                    if (model.pieceAt(r, c).player() == model.currentPlayer()) {
                                         lastClickedRow = r;
                                         lastClickedColumn = c;
                                         board[r][c].setBackground(Color.PINK);
@@ -313,8 +313,7 @@ public class ChessPanel extends JPanel {
                                         firstClickFlag = false;
                                     }
                                 }
-                            }
-                            else {
+                            } else {
                                 // set the background color of the square selected on the first click back to a normal color
                                 setBackGroundColor(lastClickedRow, lastClickedColumn);
                                 toRow = r;
@@ -334,6 +333,7 @@ public class ChessPanel extends JPanel {
                             }
 
                         }
+            }
         }
     }
 }

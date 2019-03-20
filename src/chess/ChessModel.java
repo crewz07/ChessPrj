@@ -153,8 +153,7 @@ public class ChessModel implements IChessModel {
 			else if(player == Player.BLACK){
 				Move lrook = new Move(0,0,0,3);
 				Move king = new Move(0,4,0,2);
-				this.move(lrook);
-				this.move(king);
+
 
 				//move lrook
 				board[lrook.toRow][lrook.toColumn] =
@@ -178,8 +177,7 @@ public class ChessModel implements IChessModel {
 				//king side castling
 				Move rRook = new Move(7,7,7,5);
 				Move king = new Move(7,4,7,6);
-				this.move(rRook);
-				this.move(king);
+
 
 				//move rRook
 				board[rRook.toRow][rRook.toColumn] =
