@@ -25,6 +25,7 @@ public class ModelTests {
         Assert.assertFalse("King has moved," +
                 "white castle should not be enabled",buttons[1]
         );
+
     }
 
     /******************************************************************

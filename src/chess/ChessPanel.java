@@ -104,6 +104,8 @@ public class ChessPanel extends JPanel {
         // disable the black castling buttons
         bCastleRight.setEnabled(false);
         bCastleLeft.setEnabled(false);
+        wCastleLeft.setEnabled(false);
+        wCastleRight.setEnabled(false);
 
         firstClickFlag = true;
     }
@@ -190,29 +192,38 @@ public class ChessPanel extends JPanel {
     // method that updates the board
     private void displayBoard() {
         // determine which castling buttons will be active according to the board state and current player
-        if(model.currentPlayer() == Player.WHITE) {
-            if(!model.wKingMoved) {
-                wCastleRight.setEnabled(true);
-                wCastleLeft.setEnabled(true);
-                if(model.lwRookMoved)
-                    wCastleLeft.setEnabled(false);
-                if(model.rwRookMoved)
-                    wCastleRight.setEnabled(false);
-            }
-            bCastleRight.setEnabled(false);
-            bCastleLeft.setEnabled(false);
-        } else {
-            if(!model.bKingMoved) {
-                bCastleRight.setEnabled(true);
-                bCastleLeft.setEnabled(true);
-                if(model.lbRookMoved)
-                    bCastleLeft.setEnabled(false);
-                if(model.rbRookMoved)
-                    bCastleRight.setEnabled(false);
-            }
-            wCastleRight.setEnabled(false);
-            wCastleLeft.setEnabled(false);
-        }
+        //need to add that if there are pieces in the way, you can just query model class, im already doing that
+
+        //0 = lw, 1 = rw, 2 = lb, 3 = rw
+        boolean[] castleEnable = model.castleEnable();
+        wCastleLeft.setEnabled(castleEnable[0]);
+        wCastleRight.setEnabled(castleEnable[1]);
+        bCastleLeft.setEnabled(castleEnable[2]);
+        bCastleRight.setEnabled(castleEnable[3]);
+
+//        if(model.currentPlayer() == Player.WHITE) {
+//            if(!model.wKingMoved) {
+//                wCastleRight.setEnabled(true);
+//                wCastleLeft.setEnabled(true);
+//                if(model.lwRookMoved)
+//                    wCastleLeft.setEnabled(false);
+//                if(model.rwRookMoved)
+//                    wCastleRight.setEnabled(false);
+//            }
+//            bCastleRight.setEnabled(false);
+//            bCastleLeft.setEnabled(false);
+//        } else {
+//            if(!model.bKingMoved) {
+//                bCastleRight.setEnabled(true);
+//                bCastleLeft.setEnabled(true);
+//                if(model.lbRookMoved)
+//                    bCastleLeft.setEnabled(false);
+//                if(model.rbRookMoved)
+//                    bCastleRight.setEnabled(false);
+//            }
+//            wCastleRight.setEnabled(false);
+//            wCastleLeft.setEnabled(false);
+//        }
 
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++)
