@@ -290,17 +290,52 @@ public class ChessModel implements IChessModel {
 		ArrayList<int[]> formattedKingPositions = this.findKing();
 		int[] blackKingLoc = formattedKingPositions.get(0);
 		int[] whiteKingLoc = formattedKingPositions.get(1);
-
+		int blackRow = blackKingLoc[0];
+		int blackCol = blackKingLoc[1];
+		int whiteRow = whiteKingLoc[0];
+		int whiteCol = whiteKingLoc[1];
+		Move move;
+		boolean valid = false;
 		//META:at start of turn are you in check, yes must move out
 		//META:current player moves, did current player put themselves
 		//		into check
 
 		//check p color, check if opposing piece's isValid method can get
 		//	to p color king.
-		//if anyone can break out of loop and return true
-		//finish loop return false
+		if(player == Player.BLACK) {
+			for (int r = 0; r < numRows; r++)
+				for (int c = 0; c < numColumns; c++) {
 
-		boolean valid = false;
+					//if not an empty space and piece attacking king is
+					//	on opposite team
+					if (board[r][c] != null &&
+							board[r][c].player() != player) {
+						move = new Move(r, c, blackRow, blackCol);
+						if (board[r][c].isValidMove(move, board)) {
+							valid = true;
+							break;
+						}
+					}
+				}
+		}
+
+		else if(player == Player.WHITE) {
+			for (int r = 0; r < numRows; r++)
+				for (int c = 0; c < numColumns; c++) {
+
+					//if not an empty space and piece attacking king is
+					//	on opposite team
+					if (board[r][c] != null &&
+							board[r][c].player() != player) {
+						move = new Move(r, c, whiteRow, whiteCol);
+						if (board[r][c].isValidMove(move, board)) {
+							valid = true;
+							break;
+						}
+					}
+				}
+		}
+
 		return valid;
 	}
 
