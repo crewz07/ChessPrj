@@ -5,7 +5,6 @@ public class Rook extends ChessPiece {
 	public Rook(Player player) {
 		
 		super(player);
-		
 	}
 
 	public String type() {
@@ -75,8 +74,4 @@ public class Rook extends ChessPiece {
 			return true;
 		}
 	}
-	
 }
-
-// there's probably a cleaner/more efficient way to implement this class,
-// might come back to this later

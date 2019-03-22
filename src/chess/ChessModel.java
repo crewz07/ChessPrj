@@ -15,6 +15,16 @@ public class ChessModel implements IChessModel {
 	public boolean rwRookMoved;
 	public boolean lwRookMoved;
 
+	int ctWhiteKingMoved;
+	int ctBlackKingMoved;
+	int ctrbRookMoved;
+	int ctlbRookMoved;
+	int ctrwRookMoved;
+	int ctlwRookMoved;
+
+	public static int moveCount = 0;
+	ArrayList<Move>lastMoves;
+
 	// declare other instance variables as needed
 
 	public ChessModel() {
@@ -235,13 +245,24 @@ public class ChessModel implements IChessModel {
 
 	public void move(Move move) {
 
+		//if king is being moved
 		if(board[move.fromRow][move.fromColumn] instanceof King){
 			if(board[move.fromRow][move.fromColumn].player() ==
 					Player.WHITE){
-				wKingMoved = true;
+
+				//if king hasn't moved before
+				if(!wKingMoved){
+					wKingMoved = true;
+					ctWhiteKingMoved = moveCount + 1;
+				}
+
+
 			}
 			else{
-				bKingMoved = true;
+				if(!bKingMoved){
+					bKingMoved = true;
+					ctBlackKingMoved = moveCount + 1;
+				}
 			}
 		}
 
@@ -254,12 +275,18 @@ public class ChessModel implements IChessModel {
 
 				//if it was left rook
 				if(move.fromColumn == 0){
-					lwRookMoved = true;
+					if(!lwRookMoved){
+						lwRookMoved = true;
+						ctlwRookMoved = moveCount + 1;
+					}
 				}
 
 				//if it was right rook
 				else if(move.fromColumn == 7){
-					rwRookMoved = true;
+					if(!rwRookMoved){
+						rwRookMoved = true;
+						ctrwRookMoved = moveCount + 1;
+					}
 				}
 			}
 
@@ -267,12 +294,18 @@ public class ChessModel implements IChessModel {
 			else{
 				//if it was left rook
 				if(move.fromColumn == 0){
-					lbRookMoved = true;
+					if(!lbRookMoved){
+						lbRookMoved = true;
+						ctlbRookMoved = moveCount + 1;
+					}
 				}
 
 				//if it was right rook
 				else if(move.fromColumn == 7){
-					rbRookMoved = true;
+					if(!rbRookMoved){
+						rbRookMoved = true;
+						ctrbRookMoved = moveCount + 1;
+					}
 				}
 			}
 		}
@@ -280,6 +313,8 @@ public class ChessModel implements IChessModel {
 		board[move.toRow][move.toColumn] =
 				board[move.fromRow][move.fromColumn];
 		board[move.fromRow][move.fromColumn] = null;
+		moveCount++;
+		logMove(move);
 	}
 
 	public boolean inCheck(Player p) {
@@ -393,6 +428,19 @@ public class ChessModel implements IChessModel {
 				formattedkingPositions.add(kingPositions.get(1));
 			}
 		return formattedkingPositions;
+	}
+
+	//when needing to undo a move, would be useful to just have
+	//	the move from/ move to switched so to undo it, we would
+	//  just have to get the undo. So log move will reverse the
+	//  order the saving toRow as from and from row as the to
+	public void logMove(Move move){
+
+		//save reverse of move
+		Move reverseMove = new Move(move.toRow,move.toColumn,move.fromRow,move.fromColumn);
+
+		//add reverse move to undo list
+		lastMoves.add(reverseMove);
 	}
 
 	public void AI() {

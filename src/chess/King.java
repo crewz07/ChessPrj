@@ -4,22 +4,12 @@ import java.util.ArrayList;
 
 public class King extends ChessPiece {
 
-	int[] rowMod = new int[] {-1,0,1,1,1,0,-1,-1};
-	int[] colMod = new int[] {-1,-1,-1,0,1,1,1,0};
-	boolean hasMoved;
-
-
-	public boolean isHasMoved() {
-		return hasMoved;
-	}
-
-	public void setHasMoved(boolean hasMoved) {
-		this.hasMoved = hasMoved;
-	}
+	private int[] rowMod = new int[] {-1,0,1,1,1,0,-1,-1};
+	private int[] colMod = new int[] {-1,-1,-1,0,1,1,1,0};
 
 	public King(Player player) {
 		super(player);
-		hasMoved = false;
+
 	}
 
 	public String type() {

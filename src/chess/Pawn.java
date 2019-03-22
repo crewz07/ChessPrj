@@ -6,6 +6,7 @@ package chess;
 public class Pawn extends ChessPiece {
 	private int direction;
 
+
 	public Pawn(Player player) {
 		super(player);
 		direction = player == Player.WHITE ? -1 : 1;
