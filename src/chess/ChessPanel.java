@@ -14,6 +14,8 @@ public class ChessPanel extends JPanel {
     private JButton bCastleLeft = new JButton();
     private JButton bCastleRight = new JButton();
 
+    private JButton undoButton = new JButton();
+
     private ImageIcon wRook;
     private ImageIcon wBishop;
     private ImageIcon wQueen;
@@ -87,6 +89,11 @@ public class ChessPanel extends JPanel {
         add(wCastleRight, gbc);
         gbc.anchor = GridBagConstraints.NORTH;
         add(bCastleRight, gbc);
+
+        //add undoButton
+        add(undoButton);
+        undoButton.setText("Undo");
+        undoButton.addActionListener(listener);
 
         // position the left castling buttons
         gbc.gridx = 0;
@@ -266,6 +273,10 @@ public class ChessPanel extends JPanel {
             }
             else if(event.getSource() == bCastleLeft) {
                 model.moveCastle(true);
+                displayBoard();
+            }
+            else if(event.getSource() == undoButton) {
+                model.undo();
                 displayBoard();
             }
             else {

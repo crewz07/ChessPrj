@@ -1,5 +1,6 @@
 package chess;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 public class ChessModel implements IChessModel {
@@ -434,7 +435,7 @@ public class ChessModel implements IChessModel {
 		//see if we are in check
         if(inCheck(this.player)){
             undo();
-            System.out.println("You are in check");
+            JOptionPane.showMessageDialog(null,"You are in check");
         }
 
         //if not in check, must have been a valid move move to next player.
@@ -602,6 +603,10 @@ public class ChessModel implements IChessModel {
 
             //remove top move from list
             moveList.remove(0);
+
+            if(!inCheck(player.WHITE) || !inCheck(player.BLACK)){
+            	setNextPlayer();
+			}
         }
     }
 
