@@ -432,16 +432,7 @@ public class ChessModel implements IChessModel {
         else
             moveList.add(0,aMove);
 
-		//see if we are in check
-        if(inCheck(this.player)){
-            undo();
-            JOptionPane.showMessageDialog(null,"You are in check");
-        }
-
-        //if not in check, must have been a valid move move to next player.
-        else{
-            setNextPlayer();
-        }
+		setNextPlayer();
 	}
 
 	public boolean inCheck(Player p) {
@@ -464,14 +455,14 @@ public class ChessModel implements IChessModel {
 
 		//check p color, check if opposing piece's isValid method can get
 		//	to p color king.
-		if(player == Player.BLACK) {
+		if(p == Player.BLACK) {
 			for (int r = 0; r < numRows; r++)
 				for (int c = 0; c < numColumns; c++) {
 
 					//if not an empty space and piece attacking king is
 					//	on opposite team
 					if (board[r][c] != null &&
-							board[r][c].player() != player) {
+							board[r][c].player() != p) {
 						move = new Move(r, c, blackRow, blackCol);
 						if (board[r][c].isValidMove(move, board)) {
 							valid = true;
@@ -481,14 +472,14 @@ public class ChessModel implements IChessModel {
 				}
 		}
 
-		else if(player == Player.WHITE) {
+		else if(p == Player.WHITE) {
 			for (int r = 0; r < numRows; r++)
 				for (int c = 0; c < numColumns; c++) {
 
 					//if not an empty space and piece attacking king is
 					//	on opposite team
 					if (board[r][c] != null &&
-							board[r][c].player() != player) {
+							board[r][c].player() != p) {
 						move = new Move(r, c, whiteRow, whiteCol);
 						if (board[r][c].isValidMove(move, board)) {
 							valid = true;

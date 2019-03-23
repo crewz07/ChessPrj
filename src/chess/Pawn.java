@@ -36,7 +36,6 @@ public class Pawn extends ChessPiece {
 
 			if (move.fromRow + direction == move.toRow)
 				return true;
-			System.out.print("hm");
 		} else if (Math.abs(move.fromColumn - move.toColumn) == 1) {
 			if (move.fromRow + direction == move.toRow)
 				return board[move.toRow][move.toColumn] != null;

@@ -283,41 +283,44 @@ public class ChessPanel extends JPanel {
                 for (int r = 0; r < model.numRows(); r++)
                     for (int c = 0; c < model.numColumns(); c++)
                         if (board[r][c] == event.getSource()) {
-                            if (firstClickFlag == true) {
-
-                                //make sure it is actually a piece
+                            // if it's the first click...
+                            if (firstClickFlag) {
+                                // ...and if there's a piece at (r, c)...
                                 if (model.pieceAt(r, c) != null) {
-
-                                    // if the piece belongs to the active player, highlight the square it's on
+                                    // ...and if that piece belongs to the current player...
                                     if (model.pieceAt(r, c).player() == model.currentPlayer()) {
                                         lastClickedRow = r;
                                         lastClickedColumn = c;
                                         board[r][c].setBackground(Color.PINK);
-                                    }
 
-                                    //make sure it is that pieces turn
-                                    if (model.pieceAt(r, c).player()
-                                            == model.currentPlayer()) {
                                         fromRow = r;
                                         fromCol = c;
                                         firstClickFlag = false;
                                     }
                                 }
                             } else {
-
                                 // set the background color of the square selected on the first click back to a normal color
                                 setBackGroundColor(lastClickedRow, lastClickedColumn);
                                 toRow = r;
                                 toCol = c;
                                 firstClickFlag = true;
-                                Move m = new Move(
-                                        fromRow, fromCol, toRow, toCol);
-                                if ((model.isValidMove(m)) == true) {
-
-                                    //move piece now that its valid, which updates players turn
+                                Move m = new Move(fromRow, fromCol, toRow, toCol);
+                                if ((model.isValidMove(m))) {
+                                    // move piece now that it's valid, which updates players turn
                                     model.move(m);
 
-                                    displayBoard();
+                                    // if the player that just made that move is in check,
+                                    // undo that move and create a pop-up notification
+                                    if(model.inCheck(model.currentPlayer().next())) {
+                                        model.undo();
+                                        JOptionPane.showMessageDialog(ChessPanel.this, "You have to make a move that gets your King out of check.");
+                                    }
+                                    else {
+                                        displayBoard();
+                                        if(model.inCheck(model.currentPlayer())) {
+                                            JOptionPane.showMessageDialog(ChessPanel.this, "Check!");
+                                        }
+                                    }
                                 }
                             }
 
