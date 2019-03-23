@@ -23,7 +23,7 @@ public class ChessModel implements IChessModel {
 	int ctlwRookMoved;
 
 	public static int moveCount = 0;
-	ArrayList<Move>lastMoves;
+	ArrayList<MoveList>moveList = new ArrayList<>();
 
 	// declare other instance variables as needed
 
@@ -245,6 +245,10 @@ public class ChessModel implements IChessModel {
 
 	public void move(Move move) {
 
+	    IChessPiece taken;
+        IChessPiece moved;
+        MoveList aMove;
+
 		//if king is being moved
 		if(board[move.fromRow][move.fromColumn] instanceof King){
 			if(board[move.fromRow][move.fromColumn].player() ==
@@ -309,12 +313,40 @@ public class ChessModel implements IChessModel {
 				}
 			}
 		}
+		moved = board[move.fromRow][move.fromColumn];
+        taken = board[move.toRow][move.toColumn];
 
+        //attempt move
 		board[move.toRow][move.toColumn] =
 				board[move.fromRow][move.fromColumn];
 		board[move.fromRow][move.fromColumn] = null;
+
+		//increase moveCount
 		moveCount++;
-		logMove(move);
+
+
+		if(taken == null){
+            aMove = new MoveList(moveCount,moved,move);
+        }
+		else{
+            aMove = new MoveList(moveCount,moved,taken,move);
+        }
+		//logMoves that were made
+        if(moveList.isEmpty())
+		    moveList.add(aMove);
+        else
+            moveList.add(0,aMove);
+
+		//see if we are in check
+        if(inCheck(this.player)){
+            undo();
+            System.out.println("You are in check");
+        }
+
+        //if not in check, must have been a valid move move to next player.
+        else{
+            setNextPlayer();
+        }
 	}
 
 	public boolean inCheck(Player p) {
@@ -399,6 +431,86 @@ public class ChessModel implements IChessModel {
 		board[row][column] = piece;
 	}
 
+	public void undo(){
+	    if(moveCount > 0) {
+            IChessPiece movedPiece;
+            IChessPiece takenPiece;
+            Move move;
+            int lastMoveCount;
+
+            //get top object in array;
+            MoveList lastMove = moveList.get(0);
+            movedPiece = lastMove.getPieceMoved();
+            takenPiece = lastMove.getPieceTaken();
+            move = lastMove.getMove();
+            lastMoveCount = lastMove.getMoveCount();
+
+
+            //check for pieces that hold different options
+            //King
+            if (movedPiece instanceof King) {
+                if (movedPiece.player() == Player.WHITE) {
+
+                    //was this white kings first time being moved?
+                    if (ctWhiteKingMoved == lastMoveCount) {
+
+                        //reset whiteKing boolean to false
+                        wKingMoved = false;
+                        ctWhiteKingMoved = 0;
+                    }
+                }
+                else{
+                    if(ctBlackKingMoved == lastMoveCount){
+                        bKingMoved = false;
+                        ctBlackKingMoved = 0;
+                    }
+                }
+            }
+
+            //Rooks
+            if (movedPiece instanceof Rook){
+                if(movedPiece.player() == Player.WHITE){
+
+                    //if the place I'm trying to go back to is column 0 or 7
+                    if(move.toColumn == 0){
+                        if(ctlwRookMoved == lastMoveCount){
+                            lwRookMoved = false;
+                            ctlwRookMoved = 0;
+                        }
+                    }
+                    else if(move.toColumn == 7){
+                        if(ctrwRookMoved == lastMoveCount){
+                            rwRookMoved = false;
+                            ctrwRookMoved = 0;
+                        }
+                    }
+                }
+                else{
+                    if(move.toColumn == 0){
+                        if(ctlbRookMoved == lastMoveCount){
+                            lbRookMoved = false;
+                            ctlbRookMoved = 0;
+                        }
+                    }
+                    else if(move.toColumn == 7){
+                        if(ctrbRookMoved == lastMoveCount){
+                            rbRookMoved = false;
+                            ctrwRookMoved = 0;
+                        }
+                    }
+                }
+            }
+
+            //swap pieces back
+            board[move.fromRow][move.fromColumn] = movedPiece;
+            board[move.toRow][move.toColumn] = takenPiece;
+            moveCount--;
+
+            //remove top move from list
+            moveList.remove(0);
+        }
+    }
+
 	//finds the location of both kings, returns array list containing
 	//an integer arrays size 2 with white king first, integer array
 	//holds[row,col]
@@ -430,19 +542,6 @@ public class ChessModel implements IChessModel {
 		return formattedkingPositions;
 	}
 
-	//when needing to undo a move, would be useful to just have
-	//	the move from/ move to switched so to undo it, we would
-	//  just have to get the undo. So log move will reverse the
-	//  order the saving toRow as from and from row as the to
-	public void logMove(Move move){
-
-		//save reverse of move
-		Move reverseMove = new Move(move.toRow,move.toColumn,move.fromRow,move.fromColumn);
-
-		//add reverse move to undo list
-		lastMoves.add(reverseMove);
-	}
-
 	public void AI() {
 		/*
 		 * Write a simple AI set of rules in the following order.
@@ -460,6 +559,44 @@ public class ChessModel implements IChessModel {
 		 *d. Move a piece (pawns first) forward toward opponent king
 		 *		i. check to see if that piece is in danger of being removed, if so, move a different piece.
 		 */
-
 	}
+
+	public class MoveList{
+
+
+
+        int moveCount;
+	    IChessPiece pieceMoved;
+	    IChessPiece pieceTaken;
+	    Move move;
+
+	    MoveList(int moveCount,IChessPiece pieceMoved, IChessPiece pieceTaken,Move move){
+	        this.moveCount = moveCount;
+	        this.pieceMoved = pieceMoved;
+	        this.pieceTaken = pieceTaken;
+	        this.move = move;
+        }
+
+        MoveList(int moveCount,IChessPiece pieceMoved,Move move){
+            this.moveCount = moveCount;
+            this.pieceMoved = pieceMoved;
+            this.move = move;
+        }
+
+        public int getMoveCount() {
+            return moveCount;
+        }
+
+        public IChessPiece getPieceMoved() {
+            return pieceMoved;
+        }
+
+        public IChessPiece getPieceTaken() {
+            return pieceTaken;
+        }
+
+        public Move getMove() {
+            return move;
+        }
+    }
 }

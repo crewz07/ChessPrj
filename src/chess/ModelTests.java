@@ -57,9 +57,7 @@ public class ModelTests {
         Move blackQueen = new Move(0,3,3,4);
 
         chess.move(whiteKing);
-        chess.setNextPlayer();
         chess.move(blackQueen);
-        chess.setNextPlayer();
         Assert.assertTrue("White king should be in check",
                 chess.inCheck(chess.currentPlayer()));
     }
@@ -69,6 +67,32 @@ public class ModelTests {
         this.setUpBoard();
         Assert.assertFalse("New board, no one should be in check",
                 chess.inCheck(chess.currentPlayer()));
+    }
+
+    @Test
+    public void moveKingForwardAndBack(){
+        checkInCheck();
+
+        //move whiteKingForward one
+        Move whiteKing = new Move(5,4,4,4);
+        IChessPiece king = chess.pieceAt(5,4);
+        chess.move(whiteKing);
+        Assert.assertEquals("White King should not have moved",
+                 king,chess.pieceAt(5,4));
+    }
+
+    @Test
+    public void resetKingOnFirstMove(){
+        setUpBoard();
+        Move whiteKing = new Move(7,4,5,4);
+        chess.move(whiteKing);
+
+        Assert.assertTrue("King variable holding if king" +
+                "has moved should be true",chess.wKingMoved);
+        chess.undo();
+
+        Assert.assertFalse("King variable holding if king" +
+                " has moved should be false",chess.wKingMoved);
     }
     /******************************************************************
      * Method used to reset global board

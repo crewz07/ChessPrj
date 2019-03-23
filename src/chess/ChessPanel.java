@@ -303,11 +303,9 @@ public class ChessPanel extends JPanel {
                                         fromRow, fromCol, toRow, toCol);
                                 if ((model.isValidMove(m)) == true) {
 
-                                    //move piece now that its valid
+                                    //move piece now that its valid, which updates players turn
                                     model.move(m);
 
-                                    //update whos turn it is
-                                    model.setNextPlayer();
                                     displayBoard();
                                 }
                             }
