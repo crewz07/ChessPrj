@@ -140,6 +140,10 @@ public class ChessModel implements IChessModel {
 	 *************************************************************/
 	public void moveCastle(boolean left){
 
+		IChessPiece movedRook;
+		IChessPiece movedKing;
+		MoveList aMove;
+
 		//queen side castling
 		if(left) {
 			if(player == Player.WHITE){
@@ -148,17 +152,40 @@ public class ChessModel implements IChessModel {
 				Move king = new Move(7,4,7,2);
 
 				//move lrook
+				movedRook = board[lrook.fromRow][lrook.fromColumn];
+
+				//attempt to move rook
 				board[lrook.toRow][lrook.toColumn] =
 						board[lrook.fromRow][lrook.fromColumn];
 				board[lrook.fromRow][lrook.fromColumn] = null;
-				lwRookMoved = true;
 
-				//move king
+				lwRookMoved = true;
+				ctlwRookMoved = moveCount + 1;
+				moveCount++;
+
+				movedKing = board[king.fromRow][king.fromColumn];
+				//attempt to move king
 				board[king.toRow][king.toColumn] =
 						board[king.fromRow][king.fromColumn];
 				board[king.fromRow][king.fromColumn] = null;
+
 				wKingMoved = true;
-				this.setNextPlayer();
+				ctWhiteKingMoved = moveCount + 1;
+				moveCount++;
+
+				aMove = new MoveList(moveCount-1,movedRook,lrook);
+				moveList.add(0,aMove);
+
+				aMove = new MoveList(moveCount,movedKing,king);
+				moveList.add(0,aMove);
+
+				if(inCheck(player)){
+					undo();
+					undo();
+				}
+				else {
+					this.setNextPlayer();
+				}
 			}
 
 			//black players turn
@@ -166,19 +193,39 @@ public class ChessModel implements IChessModel {
 				Move lrook = new Move(0,0,0,3);
 				Move king = new Move(0,4,0,2);
 
+				movedRook = board[lrook.fromRow][lrook.fromColumn];
 
 				//move lrook
 				board[lrook.toRow][lrook.toColumn] =
 						board[lrook.fromRow][lrook.fromColumn];
 				board[lrook.fromRow][lrook.fromColumn] = null;
 				lbRookMoved = true;
+				ctlbRookMoved = moveCount + 1;
+				moveCount++;
+
+				movedKing = board[king.fromRow][king.fromColumn];
 
 				//move king
 				board[king.toRow][king.toColumn] =
 						board[king.fromRow][king.fromColumn];
 				board[king.fromRow][king.fromColumn] = null;
 				bKingMoved = true;
-				this.setNextPlayer();
+				ctBlackKingMoved = moveCount + 1;
+				moveCount++;
+
+				aMove = new MoveList(moveCount-1,movedRook,lrook);
+				moveList.add(0,aMove);
+
+				aMove = new MoveList(moveCount,movedKing,king);
+				moveList.add(0,aMove);
+
+				if(inCheck(player)){
+					undo();
+					undo();
+				}
+				else {
+					this.setNextPlayer();
+				}
 			}
 		}
 
@@ -190,19 +237,41 @@ public class ChessModel implements IChessModel {
 				Move rRook = new Move(7,7,7,5);
 				Move king = new Move(7,4,7,6);
 
+				movedRook = board[rRook.fromRow][rRook.fromColumn];
 
 				//move rRook
 				board[rRook.toRow][rRook.toColumn] =
 						board[rRook.fromRow][rRook.fromColumn];
 				board[rRook.fromRow][rRook.fromColumn] = null;
+
 				rwRookMoved = true;
+				ctrwRookMoved = moveCount + 1;
+				moveCount++;
+
+				movedKing = board[king.fromRow][king.fromColumn];
 
 				//move king
 				board[king.toRow][king.toColumn] =
 						board[king.fromRow][king.fromColumn];
 				board[king.fromRow][king.fromColumn] = null;
-				bKingMoved = true;
-				this.setNextPlayer();
+
+				wKingMoved = true;
+				ctWhiteKingMoved = moveCount + 1;
+				moveCount++;
+
+				aMove = new MoveList(moveCount-1,movedRook,rRook);
+				moveList.add(0,aMove);
+
+				aMove = new MoveList(moveCount,movedKing,king);
+				moveList.add(0,aMove);
+
+				if(inCheck(player)){
+					undo();
+					undo();
+				}
+				else {
+					this.setNextPlayer();
+				}
 			}
 
 			//black players move
@@ -212,16 +281,41 @@ public class ChessModel implements IChessModel {
 				Move rRook = new Move(0,7,0,5);
 				Move king = new Move(0,4,0,6);
 
+				movedRook = board[rRook.fromRow][rRook.fromColumn];
+
 				//move rRook
 				board[rRook.toRow][rRook.toColumn] =
 						board[rRook.fromRow][rRook.fromColumn];
 				board[rRook.fromRow][rRook.fromColumn] = null;
 
+				rbRookMoved = true;
+				ctrbRookMoved = moveCount + 1;
+				moveCount++;
+
+				movedKing = board[king.fromRow][king.fromColumn];
+
 				//move king
 				board[king.toRow][king.toColumn] =
 						board[king.fromRow][king.fromColumn];
 				board[king.fromRow][king.fromColumn] = null;
-				this.setNextPlayer();
+
+				bKingMoved = true;
+				ctBlackKingMoved = moveCount + 1;
+				moveCount++;
+
+				aMove = new MoveList(moveCount-1,movedRook,rRook);
+				moveList.add(0,aMove);
+
+				aMove = new MoveList(moveCount,movedKing,king);
+				moveList.add(0,aMove);
+
+				if(inCheck(player)){
+					undo();
+					undo();
+				}
+				else {
+					this.setNextPlayer();
+				}
 			}
 		}
 	}
@@ -472,13 +566,13 @@ public class ChessModel implements IChessModel {
                 if(movedPiece.player() == Player.WHITE){
 
                     //if the place I'm trying to go back to is column 0 or 7
-                    if(move.toColumn == 0){
+                    if(move.fromColumn == 0){
                         if(ctlwRookMoved == lastMoveCount){
                             lwRookMoved = false;
                             ctlwRookMoved = 0;
                         }
                     }
-                    else if(move.toColumn == 7){
+                    else if(move.fromColumn == 7){
                         if(ctrwRookMoved == lastMoveCount){
                             rwRookMoved = false;
                             ctrwRookMoved = 0;
@@ -486,13 +580,13 @@ public class ChessModel implements IChessModel {
                     }
                 }
                 else{
-                    if(move.toColumn == 0){
+                    if(move.fromColumn == 0){
                         if(ctlbRookMoved == lastMoveCount){
                             lbRookMoved = false;
                             ctlbRookMoved = 0;
                         }
                     }
-                    else if(move.toColumn == 7){
+                    else if(move.fromColumn == 7){
                         if(ctrbRookMoved == lastMoveCount){
                             rbRookMoved = false;
                             ctrwRookMoved = 0;
