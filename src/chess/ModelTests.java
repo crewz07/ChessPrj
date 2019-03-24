@@ -324,5 +324,55 @@ public class ModelTests {
         this.chess = new ChessModel();
     }
 
+    public void clearBoard() {
+        for(int r = 0; r < 8; r++) {
+            for(int c = 0; c < 8; c++) {
+                if(chess.pieceAt(r, c) != null && !(chess.pieceAt(r, c) instanceof King)) {
+                    chess.setPiece(r, c, null);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testIsComplete_notInCheck() {
+        clearBoard();
+        Assert.assertFalse("isComplete should return false.",chess.isComplete());
+    }
+
+    @Test
+    public void testIsComplete_inCheckCanMoveOut() {
+        clearBoard();
+        chess.setPiece(7, 7, new Rook(Player.BLACK));
+        Assert.assertTrue("White should be in check.", chess.inCheck(Player.WHITE));
+        Assert.assertFalse("White should not be in checkmate", chess.isComplete());
+    }
+
+    @Test
+    public void testIsComplete_inCheckmate() {
+        clearBoard();
+        chess.setPiece(7, 7, new Rook(Player.BLACK));
+        chess.setPiece(6, 3, new Pawn(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.setPiece(6, 5, new Pawn(Player.WHITE));
+        chess.setPiece(7, 3, new Pawn(Player.WHITE));
+        Assert.assertTrue("White should be in checkmate", chess.isComplete());
+    }
+
+    @Test
+    public void testIsComplete_inCheckCanTakePiece() {
+        clearBoard();
+        chess.setPiece(6, 7, new Rook(Player.WHITE));
+        Assert.assertFalse("White should not be in checkmate.", chess.isComplete());
+    }
+
+    @Test
+    public void testIsComplete_inCheckCanBlock() {
+        clearBoard();
+        chess.setPiece(6, 6, new Rook(Player.WHITE));
+        Assert.assertFalse("White should not be in checkmate", chess.isComplete());
+    }
+
+
 
 }
