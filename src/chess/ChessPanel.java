@@ -309,7 +309,7 @@ public class ChessPanel extends JPanel {
                                     // undo that move and create a pop-up notification
                                     if(model.inCheck(model.currentPlayer().next())) {
                                         model.undo();
-                                        JOptionPane.showMessageDialog(ChessPanel.this, "You have to make a move that gets your King out of check.");
+                                        JOptionPane.showMessageDialog(ChessPanel.this, (model.inCheck(model.currentPlayer()) ? "You have to make a move that gets your King out of check." : "Making that move would put your King into check."));
                                     }
                                     else {
                                         displayBoard();
