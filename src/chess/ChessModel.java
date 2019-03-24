@@ -322,8 +322,29 @@ public class ChessModel implements IChessModel {
 	}
 
 	public boolean isComplete() {
-		boolean valid = false;
-		return valid;
+		for(int fromRow = 0; fromRow < numRows; fromRow++) {
+			for(int fromCol = 0; fromCol < numColumns; fromCol++) {
+				if(board[fromRow][fromCol] != null) {
+					if(board[fromRow][fromCol].player() == player) {
+						for(int toRow = 0; toRow < numRows; toRow++) {
+							for(int toCol = 0; toCol < numColumns; toCol++) {
+								Move move = new Move(fromRow, fromCol, toRow, toCol);
+								if(isValidMove(move)) {
+									move(move);
+									if(inCheck(player.next())) {
+										undo();
+									} else {
+										undo();
+										return false;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	public boolean isValidMove(Move move) {

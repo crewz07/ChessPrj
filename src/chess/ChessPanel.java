@@ -38,9 +38,6 @@ public class ChessPanel extends JPanel {
 
     private listener listener;
 
-    private int lastClickedRow;
-    private int lastClickedColumn;
-
     public ChessPanel() {
         model = new ChessModel();
         board = new JButton[model.numRows()][model.numColumns()];
@@ -289,27 +286,26 @@ public class ChessPanel extends JPanel {
                                 if (model.pieceAt(r, c) != null) {
                                     // ...and if that piece belongs to the current player...
                                     if (model.pieceAt(r, c).player() == model.currentPlayer()) {
-                                        lastClickedRow = r;
-                                        lastClickedColumn = c;
                                         board[r][c].setBackground(Color.PINK);
-
                                         fromRow = r;
                                         fromCol = c;
                                         firstClickFlag = false;
                                     }
                                 }
                             } else {
-                                // set the background color of the square selected on the first click back to a normal color
-                                setBackGroundColor(lastClickedRow, lastClickedColumn);
+                                // set the background color of the square selected on the first click back to its normal color
+                                setBackGroundColor(fromRow, fromCol);
+
                                 toRow = r;
                                 toCol = c;
                                 firstClickFlag = true;
                                 Move m = new Move(fromRow, fromCol, toRow, toCol);
+                                // if the move to (r, c) is valid...
                                 if ((model.isValidMove(m))) {
-                                    // move piece now that it's valid, which updates players turn
+                                    // ...move that piece to (r, c) in the model
                                     model.move(m);
 
-                                    // if the player that just made that move is in check,
+                                    // if the previous player that just made that move is still in check,
                                     // undo that move and create a pop-up notification
                                     if(model.inCheck(model.currentPlayer().next())) {
                                         model.undo();
@@ -317,8 +313,20 @@ public class ChessPanel extends JPanel {
                                     }
                                     else {
                                         displayBoard();
+                                        // if the current player was just put into check by that move...
                                         if(model.inCheck(model.currentPlayer())) {
-                                            JOptionPane.showMessageDialog(ChessPanel.this, "Check!");
+                                            // ...check if the game is over...
+                                            if(model.isComplete()) {
+                                                if(JOptionPane.showConfirmDialog(ChessPanel.this, "Play again?", "Checkmate! " + (model.currentPlayer() == Player.WHITE ? "White" : "Black") + " wins!", 0) == JOptionPane.YES_OPTION) {
+                                                    while(model.moveList.size() != 0) {
+                                                        model.undo();
+                                                    }
+                                                    displayBoard();
+                                                }
+                                            // ...if it's not, create a pop-up saying "check"
+                                            } else {
+                                                JOptionPane.showMessageDialog(ChessPanel.this, "Check!");
+                                            }
                                         }
                                     }
                                 }
