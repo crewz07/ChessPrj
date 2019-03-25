@@ -349,21 +349,52 @@ public class ChessModel implements IChessModel {
 
 	public boolean isValidMove(Move move) {
 		boolean valid = false;
+		if (board[move.fromRow][move.fromColumn] != null) {
+            if (board[move.fromRow][move.fromColumn].isValidMove(move, board)) {
+                    if (board[move.fromRow][move.fromColumn] instanceof Pawn) {
+                        if (Math.abs(move.fromColumn - move.toColumn) == 1) {
 
-		if (board[move.fromRow][move.fromColumn] != null)
+                            if (board[move.toRow][move.toColumn] == null) {
 
-			if (board[move.fromRow][move.fromColumn]
-					.isValidMove(move, board) == true)
-				valid = true;
 
+                                if(!moveList.isEmpty()) {
+                                    Move previousMove = moveList.get(0).getMove();
+                                    IChessPiece previousMovedPiece = moveList.get(0).getPieceMoved();
+                                    if (previousMovedPiece.type().equals("Pawn")) {
+                                        if (previousMovedPiece.player() != player) {
+                                            if (Math.abs(previousMove.fromRow - previousMove.toRow) == 2) {
+                                                if (previousMove.toRow == move.fromRow) {
+                                                    if (previousMove.fromColumn == move.toColumn) {
+                                                        valid = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                            } else {
+                                valid = true;
+                            }
+
+                        } else {
+                            valid = true;
+                        }
+                    } else {
+                        valid = true;
+                    }
+            }
+        }
 		return valid;
 	}
 
 	public void move(Move move) {
 
-	    IChessPiece taken;
+	    IChessPiece taken = null;
         IChessPiece moved;
         MoveList aMove;
+        boolean enPassant = false;
 
 		//if king is being moved
 		if(board[move.fromRow][move.fromColumn] instanceof King){
@@ -429,14 +460,27 @@ public class ChessModel implements IChessModel {
 				}
 			}
 		}
+
+		//en passant code
+		if(board[move.fromRow][move.fromColumn] instanceof Pawn) {
+            if (move.fromColumn != move.toColumn) {
+                if (board[move.toRow][move.toColumn] == null) {
+                    taken = board[move.fromRow][move.toColumn];
+                    board[move.fromRow][move.toColumn] = null;
+                    enPassant = true;
+                }
+            }
+        } else {
+            taken = board[move.toRow][move.toColumn];
+        }
 		moved = board[move.fromRow][move.fromColumn];
-        taken = board[move.toRow][move.toColumn];
+
 
         //attempt move
-		board[move.toRow][move.toColumn] =
-				board[move.fromRow][move.fromColumn];
+		board[move.toRow][move.toColumn] = board[move.fromRow][move.fromColumn];
 		board[move.fromRow][move.fromColumn] = null;
 
+		//moved = board[move.toRow][move.toColumn];
 		//increase moveCount
 		moveCount++;
 
@@ -445,7 +489,7 @@ public class ChessModel implements IChessModel {
             aMove = new MoveList(moveCount,moved,move);
         }
 		else{
-            aMove = new MoveList(moveCount,moved,taken,move);
+            aMove = new MoveList(moveCount,moved,taken,move,enPassant);
         }
 		//logMoves that were made
         if(moveList.isEmpty())
@@ -610,7 +654,13 @@ public class ChessModel implements IChessModel {
 
             //swap pieces back
             board[move.fromRow][move.fromColumn] = movedPiece;
-            board[move.toRow][move.toColumn] = takenPiece;
+            if(lastMove.enPassant()) {
+                board[move.toRow][move.toColumn] = null;
+                board[move.fromRow][move.toColumn] = takenPiece;
+            } else {
+                board[move.toRow][move.toColumn] = takenPiece;
+            }
+
             moveCount--;
 
             //remove top move from list
@@ -680,18 +730,36 @@ public class ChessModel implements IChessModel {
 	    IChessPiece pieceMoved;
 	    IChessPiece pieceTaken;
 	    Move move;
+	    boolean enPassant;
 
-	    MoveList(int moveCount,IChessPiece pieceMoved, IChessPiece pieceTaken,Move move){
+	    MoveList(int moveCount,IChessPiece pieceMoved, IChessPiece pieceTaken,Move move, boolean enPassant){
 	        this.moveCount = moveCount;
 	        this.pieceMoved = pieceMoved;
 	        this.pieceTaken = pieceTaken;
 	        this.move = move;
+	        this.enPassant = enPassant;
+        }
+
+        MoveList(int moveCount,IChessPiece pieceMoved,Move move, boolean enPassant){
+            this.moveCount = moveCount;
+            this.pieceMoved = pieceMoved;
+            this.move = move;
+            this.enPassant = enPassant;
+        }
+
+        MoveList(int moveCount,IChessPiece pieceMoved, IChessPiece pieceTaken,Move move){
+            this.moveCount = moveCount;
+            this.pieceMoved = pieceMoved;
+            this.pieceTaken = pieceTaken;
+            this.move = move;
+            this.enPassant = false;
         }
 
         MoveList(int moveCount,IChessPiece pieceMoved,Move move){
             this.moveCount = moveCount;
             this.pieceMoved = pieceMoved;
             this.move = move;
+            this.enPassant = false;
         }
 
         public int getMoveCount() {
@@ -709,5 +777,7 @@ public class ChessModel implements IChessModel {
         public Move getMove() {
             return move;
         }
+
+        public boolean enPassant() { return enPassant; }
     }
 }
