@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.util.ArrayList;
 
 public class ChessModel implements IChessModel {
+	private boolean testing;
+
 	private IChessPiece[][] board;
 	private Player player;
 	private int numRows = 8;
@@ -31,6 +33,7 @@ public class ChessModel implements IChessModel {
 	public ChessModel() {
 		board = new IChessPiece[8][8];
 		player = Player.WHITE;
+		testing = false;
 
 		// white pieces
 		board[7][0] = new Rook(Player.WHITE);
@@ -501,6 +504,19 @@ public class ChessModel implements IChessModel {
         else
             moveList.add(0,aMove);
 
+        if(!testing) {
+			if(player == Player.WHITE) {
+				if(inCheck(Player.WHITE)) {
+					undo();
+					JOptionPane.showMessageDialog(null, (inCheck(player.next()) ? "You have to make a move that gets your King out of check." : "Making that move would put your King into check."));
+				}
+			} else {
+				if(inCheck(Player.WHITE)) {
+					JOptionPane.showMessageDialog(null, "Check!");
+				}
+			}
+		}
+
 		setNextPlayer();
 	}
 
@@ -718,18 +734,17 @@ public class ChessModel implements IChessModel {
 		 * 		i. Attempt to put opponent into check without losing your piece (COMPLETE)
 		 *		ii. Perhaps you have won the game. (COMPLETE)
 		 *
-		 * C. Determine if any of your pieces are in danger,
-		 *		i. Move them if you can.
+		 * C. Determine if any of your pieces are in danger, (COMPLETE)
+		 *		i. Move them if you can. (COMPLETE)
 		 *		ii. Attempt to protect that piece.
 		 *
 		 * D. Move a piece (pawns first) forward toward opponent king
 		 *		i. check to see if that piece is in danger of being removed, if so, move a different piece.
 		 */
 
-		// maybe we can just make an array list with all of black's pieces
-		// so that we don't have to keep using nested for loops everywhere.
-		// maybe we could ALSO have a wrapper class that stores a piece AND
-		// all its valid moves.
+		// maybe instead of making/undoing moves to find the best one, we
+		// could just keep track of positions and use isValidMove to check
+		// everything?
 
 		if(currentPlayer() != Player.BLACK) {
 			return;
@@ -762,10 +777,13 @@ public class ChessModel implements IChessModel {
 						for (int toColumn = 0; toColumn < numColumns; toColumn++) {
 							Move move = new Move(fromRow, fromColumn, toRow, toColumn);
 							if (isValidMove(move)) {
+								testing = true;
 								move(move);
 								if (inCheck(Player.BLACK)) {
 									undo();
+									testing = false;
 								} else {
+									testing = false;
 									return;
 								}
 							}
@@ -773,6 +791,7 @@ public class ChessModel implements IChessModel {
 					}
 				}
 			} else {
+				testing = false;
 				return;
 			}
 		}
@@ -786,10 +805,12 @@ public class ChessModel implements IChessModel {
 				for(int toColumn = 0; toColumn < numColumns; toColumn++) {
 					Move move = new Move(fromRow, fromColumn, toRow, toColumn);
 					if(isValidMove(move)) {
+						testing = true;
 						move(move);
 						if(inCheck(Player.WHITE)) {
 							// ii.
 							if(isComplete()) {
+								testing = false;
 								return;
 							}
 							boolean whiteCanTake = false;
@@ -804,12 +825,15 @@ public class ChessModel implements IChessModel {
 							}
 							if(whiteCanTake) {
 								undo();
+								testing = false;
 							} else {
 								undo();
+								testing = false;
 								checkMove = move;
 							}
 						} else {
 							undo();
+							testing = false;
 						}
 					}
 				}
@@ -817,9 +841,56 @@ public class ChessModel implements IChessModel {
 		}
 		if(checkMove != null) {
 			move(checkMove);
+			return;
 		}
 
+		// C.
+        for(int[] blackLocation : blackPieceLocations) {
+            int toRow = blackLocation[0];
+            int toColumn = blackLocation[1];
+            for(int[] whiteLocation : whitePieceLocations) {
+                int fromRow = whiteLocation[0];
+                int fromColumn = whiteLocation[1];
+                // if a white piece can take a black piece
+                if(isValidMove(new Move(fromRow, fromColumn, toRow, toColumn))) {
+                    // try to move that piece
+                    for(int toRow2 = 0; toRow2 < numRows; toRow2++) {
+                        for(int toColumn2 = 0; toColumn2 < numColumns; toColumn2++) {
+                            Move move = new Move(toRow, toColumn, toRow2, toColumn2);
+                            if(isValidMove(move)) {
+                            	testing = true;
+                                move(move);
+                                // recheck if white can take it
+                                for(int[] whiteLocation2 : whitePieceLocations) {
+                                	Move move2 = new Move(whiteLocation2[0], whiteLocation2[1], toRow2, toColumn2);
+									if(isValidMove(move2)){
+                                		undo();
+                                		testing = false;
+                                		break;
+									}
+                                }
+                                // if the piece was moved, check if it put the black king in check
+                                if(inCheck(Player.BLACK)) {
+                                	undo();
+                                	testing = false;
+								}
+                                // if the piece was safely moved and didn't put black in check, return
+                                if(testing) {
+                                	testing = false;
+                                	return;
+								}
+                            }
+                        }
+                    }
+                    //if the piece could not be moved safely, try to protect it
 
+
+
+
+
+                }
+            }
+        }
 
 
 
