@@ -351,7 +351,7 @@ public class ChessModel implements IChessModel {
 		boolean valid = false;
 		if (board[move.fromRow][move.fromColumn] != null) {
             if (board[move.fromRow][move.fromColumn].isValidMove(move, board)) {
-                    if (board[move.fromRow][move.fromColumn] instanceof Pawn) {
+                    if (board[move.fromRow][move.fromColumn].type().equals("Pawn")) {
                         if (Math.abs(move.fromColumn - move.toColumn) == 1) {
 
                             if (board[move.toRow][move.toColumn] == null) {
@@ -468,8 +468,12 @@ public class ChessModel implements IChessModel {
                     taken = board[move.fromRow][move.toColumn];
                     board[move.fromRow][move.toColumn] = null;
                     enPassant = true;
-                }
-            }
+                } else {
+					taken = board[move.toRow][move.toColumn];
+				}
+            } else {
+				taken = board[move.toRow][move.toColumn];
+			}
         } else {
             taken = board[move.toRow][move.toColumn];
         }
@@ -529,7 +533,7 @@ public class ChessModel implements IChessModel {
 					if (board[r][c] != null &&
 							board[r][c].player() != p) {
 						move = new Move(r, c, blackRow, blackCol);
-						if (board[r][c].isValidMove(move, board)) {
+						if (/*board[r][c].isValidMove(move, board)*/isValidMove(move)) {
 							valid = true;
 							break;
 						}
@@ -546,7 +550,7 @@ public class ChessModel implements IChessModel {
 					if (board[r][c] != null &&
 							board[r][c].player() != p) {
 						move = new Move(r, c, whiteRow, whiteCol);
-						if (board[r][c].isValidMove(move, board)) {
+						if (/*board[r][c].isValidMove(move, board)*/ isValidMove(move)) {
 							valid = true;
 							break;
 						}
@@ -683,13 +687,14 @@ public class ChessModel implements IChessModel {
 		//create arrayList
 		ArrayList<int[]> kingPositions = new ArrayList<>();
 		ArrayList<int[]> formattedkingPositions = new ArrayList<>();
-		for(int r = 0; r < numRows; r++)
-			for(int c = 0; c < numColumns; c++){
-				if(board[r][c] instanceof King){
-					int[] position = {r,c};
+		for(int r = 0; r < numRows; r++) {
+			for (int c = 0; c < numColumns; c++) {
+				if (board[r][c] instanceof King) {
+					int[] position = {r, c};
 					kingPositions.add(position);
 				}
 			}
+		}
 		int[] kingPosition = kingPositions.get(0);
 			if(board[kingPosition[0]][kingPosition[1]].player() ==
 					Player.WHITE){
@@ -706,20 +711,119 @@ public class ChessModel implements IChessModel {
 	public void AI() {
 		/*
 		 * Write a simple AI set of rules in the following order.
-		 * a. Check to see if you are in check.
-		 * 		i. If so, get out of check by moving the king or placing a piece to block the check
+		 * A. Check to see if you are in check. (COMPLETE)
+		 * 		i. If so, get out of check by moving the king or placing a piece to block the check (COMPLETE)
 		 *
-		 * b. Attempt to put opponent into check (or checkmate).
-		 * 		i. Attempt to put opponent into check without losing your piece
-		 *		ii. Perhaps you have won the game.
+		 * B. Attempt to put opponent into check (or checkmate). (COMPLETE)
+		 * 		i. Attempt to put opponent into check without losing your piece (COMPLETE)
+		 *		ii. Perhaps you have won the game. (COMPLETE)
 		 *
-		 *c. Determine if any of your pieces are in danger,
+		 * C. Determine if any of your pieces are in danger,
 		 *		i. Move them if you can.
 		 *		ii. Attempt to protect that piece.
 		 *
-		 *d. Move a piece (pawns first) forward toward opponent king
+		 * D. Move a piece (pawns first) forward toward opponent king
 		 *		i. check to see if that piece is in danger of being removed, if so, move a different piece.
 		 */
+
+		// maybe we can just make an array list with all of black's pieces
+		// so that we don't have to keep using nested for loops everywhere.
+		// maybe we could ALSO have a wrapper class that stores a piece AND
+		// all its valid moves.
+
+		if(currentPlayer() != Player.BLACK) {
+			return;
+		}
+
+		ArrayList<int[]> whitePieceLocations = new ArrayList<>();
+		ArrayList<int[]> blackPieceLocations = new ArrayList<>();
+
+		for(int r = 0; r < numRows; r++) {
+			for(int c = 0; c < numColumns; c++) {
+				if(board[r][c] != null) {
+					int[] location = {r, c};
+					if(board[r][c].player() == Player.WHITE) {
+						whitePieceLocations.add(location);
+					} else {
+						blackPieceLocations.add(location);
+					}
+				}
+			}
+		}
+
+		// A.
+		if(inCheck(Player.BLACK)) {
+			// i.
+			if (!isComplete()) {
+				for (int[] location : blackPieceLocations) {
+					int fromRow = location[0];
+					int fromColumn = location[1];
+					for (int toRow = 0; toRow < numRows; toRow++) {
+						for (int toColumn = 0; toColumn < numColumns; toColumn++) {
+							Move move = new Move(fromRow, fromColumn, toRow, toColumn);
+							if (isValidMove(move)) {
+								move(move);
+								if (inCheck(Player.BLACK)) {
+									undo();
+								} else {
+									return;
+								}
+							}
+						}
+					}
+				}
+			} else {
+				return;
+			}
+		}
+
+		// B.
+		Move checkMove = null;
+		for(int[] blackLocation : blackPieceLocations) {
+			int fromRow = blackLocation[0];
+			int fromColumn = blackLocation[1];
+			for(int toRow = 0; toRow < numRows; toRow++) {
+				for(int toColumn = 0; toColumn < numColumns; toColumn++) {
+					Move move = new Move(fromRow, fromColumn, toRow, toColumn);
+					if(isValidMove(move)) {
+						move(move);
+						if(inCheck(Player.WHITE)) {
+							// ii.
+							if(isComplete()) {
+								return;
+							}
+							boolean whiteCanTake = false;
+							// i.
+							for(int[] whiteLocation : whitePieceLocations) {
+								int fromRow2 = whiteLocation[0];
+								int fromColumn2 = whiteLocation[1];
+								Move move2 = new Move(fromRow2, fromColumn2, toRow, toColumn);
+								if(isValidMove(move2)) {
+									whiteCanTake = true;
+								}
+							}
+							if(whiteCanTake) {
+								undo();
+							} else {
+								undo();
+								checkMove = move;
+							}
+						} else {
+							undo();
+						}
+					}
+				}
+			}
+		}
+		if(checkMove != null) {
+			move(checkMove);
+		}
+
+
+
+
+
+
 	}
 
 	public class MoveList{
