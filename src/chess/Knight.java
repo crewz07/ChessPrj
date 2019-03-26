@@ -2,15 +2,28 @@ package chess;
 
 public class Knight extends ChessPiece {
 
+	/******************************************************************
+	 * Default constructor for the knight piece
+	 * @param player for the player the piece should be created for
+	 *****************************************************************/
 	public Knight(Player player) {
 
 		super(player);
 
 	}
 
+	/******************************************************************
+	 * Getter for a string of the piece's type
+	 * @Return string "Knight" for the piece's type
+	 *****************************************************************/
 	public String type() { return "Knight"; }
 
-	// determines if the move is valid for a knight piece
+	/******************************************************************
+	 * Checks to see if the piece is making a valid move for its type
+	 * @param move - the move being made
+	 * @param board - where the piece is on the board
+	 * @return boolean if the move is valid or not
+	 *****************************************************************/
 	public boolean isValidMove(Move move, IChessPiece[][] board) {
 		// checks the baseline rules for each chess piece
 		if(!super.isValidMove(move, board)) {
