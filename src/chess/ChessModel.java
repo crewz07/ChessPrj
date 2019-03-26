@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 
 public class ChessModel implements IChessModel {
+	private boolean testing;
 
 	//variables related to building the game and board
 	private IChessPiece[][] board;
@@ -39,6 +40,7 @@ public class ChessModel implements IChessModel {
 	public ChessModel() {
 		board = new IChessPiece[8][8];
 		player = Player.WHITE;
+		testing = false;
 
 		// white piece creation and set up
 		board[7][0] = new Rook(Player.WHITE);
@@ -358,6 +360,7 @@ public class ChessModel implements IChessModel {
 				}
 			}
 		}
+		JOptionPane.showMessageDialog(null, "Checkmate! " + player.next() + " wins!");
 		return true;
 	}
 
@@ -370,7 +373,7 @@ public class ChessModel implements IChessModel {
 		boolean valid = false;
 		if (board[move.fromRow][move.fromColumn] != null) {
             if (board[move.fromRow][move.fromColumn].isValidMove(move, board)) {
-                    if (board[move.fromRow][move.fromColumn] instanceof Pawn) {
+                    if (board[move.fromRow][move.fromColumn].type().equals("Pawn")) {
                         if (Math.abs(move.fromColumn - move.toColumn) == 1) {
 
                             if (board[move.toRow][move.toColumn] == null) {
@@ -492,8 +495,12 @@ public class ChessModel implements IChessModel {
                     taken = board[move.fromRow][move.toColumn];
                     board[move.fromRow][move.toColumn] = null;
                     enPassant = true;
-                }
-            }
+                } else {
+					taken = board[move.toRow][move.toColumn];
+				}
+            } else {
+				taken = board[move.toRow][move.toColumn];
+			}
         } else {
             taken = board[move.toRow][move.toColumn];
         }
@@ -520,6 +527,20 @@ public class ChessModel implements IChessModel {
 		    moveList.add(aMove);
         else
             moveList.add(0,aMove);
+
+        if(!testing) {
+			if(player == Player.WHITE) {
+
+				if(inCheck(Player.WHITE)) {
+					undo();
+					JOptionPane.showMessageDialog(null, (inCheck(player.next()) ? "You have to make a move that gets your King out of check." : "Making that move would put your King into check."));
+				}
+			} else {
+				if(inCheck(Player.WHITE)) {
+					JOptionPane.showMessageDialog(null, "Check!");
+				}
+			}
+		}
 
 		setNextPlayer();
 	}
@@ -562,7 +583,7 @@ public class ChessModel implements IChessModel {
 					if (board[r][c] != null &&
 							board[r][c].player() != p) {
 						move = new Move(r, c, blackRow, blackCol);
-						if (board[r][c].isValidMove(move, board)) {
+						if (/*board[r][c].isValidMove(move, board)*/isValidMove(move)) {
 							valid = true;
 							break;
 						}
@@ -579,7 +600,7 @@ public class ChessModel implements IChessModel {
 					if (board[r][c] != null &&
 							board[r][c].player() != p) {
 						move = new Move(r, c, whiteRow, whiteCol);
-						if (board[r][c].isValidMove(move, board)) {
+						if (/*board[r][c].isValidMove(move, board)*/ isValidMove(move)) {
 							valid = true;
 							break;
 						}
@@ -749,13 +770,14 @@ public class ChessModel implements IChessModel {
 		//create arrayList
 		ArrayList<int[]> kingPositions = new ArrayList<>();
 		ArrayList<int[]> formattedkingPositions = new ArrayList<>();
-		for(int r = 0; r < numRows; r++)
-			for(int c = 0; c < numColumns; c++){
-				if(board[r][c] instanceof King){
-					int[] position = {r,c};
+		for(int r = 0; r < numRows; r++) {
+			for (int c = 0; c < numColumns; c++) {
+				if (board[r][c] instanceof King) {
+					int[] position = {r, c};
 					kingPositions.add(position);
 				}
 			}
+		}
 		int[] kingPosition = kingPositions.get(0);
 			if(board[kingPosition[0]][kingPosition[1]].player() ==
 					Player.WHITE){
@@ -772,20 +794,220 @@ public class ChessModel implements IChessModel {
 	public void AI() {
 		/*
 		 * Write a simple AI set of rules in the following order.
-		 * a. Check to see if you are in check.
-		 * 		i. If so, get out of check by moving the king or placing a piece to block the check
+		 * A. Check to see if you are in check. (COMPLETE)
+		 * 		i. If so, get out of check by moving the king or placing a piece to block the check (COMPLETE)
 		 *
-		 * b. Attempt to put opponent into check (or checkmate).
-		 * 		i. Attempt to put opponent into check without losing your piece
-		 *		ii. Perhaps you have won the game.
+		 * B. Attempt to put opponent into check (or checkmate). (COMPLETE)
+		 * 		i. Attempt to put opponent into check without losing your piece (COMPLETE)
+		 *		ii. Perhaps you have won the game. (COMPLETE)
 		 *
-		 *c. Determine if any of your pieces are in danger,
-		 *		i. Move them if you can.
-		 *		ii. Attempt to protect that piece.
+		 * C. Determine if any of your pieces are in danger, (COMPLETE)
+		 *		i. Move them if you can. (COMPLETE)
+		 *		ii. Attempt to protect that piece. (COMPLETE)
 		 *
-		 *d. Move a piece (pawns first) forward toward opponent king
+		 * D. Move a piece (pawns first) forward toward opponent king
 		 *		i. check to see if that piece is in danger of being removed, if so, move a different piece.
 		 */
+
+		// maybe instead of making/undoing moves to find the best one, we
+		// could just keep track of positions and use isValidMove to check
+		// everything?
+
+		if(currentPlayer() != Player.BLACK) {
+			return;
+		}
+
+		ArrayList<int[]> whitePieceLocations = new ArrayList<>();
+		ArrayList<int[]> blackPieceLocations = new ArrayList<>();
+
+		for(int r = 0; r < numRows; r++) {
+			for(int c = 0; c < numColumns; c++) {
+				if(board[r][c] != null) {
+					int[] location = {r, c};
+					if(board[r][c].player() == Player.WHITE) {
+						whitePieceLocations.add(location);
+					} else {
+						blackPieceLocations.add(location);
+					}
+				}
+			}
+		}
+
+		// A.
+		if(inCheck(Player.BLACK)) {
+			// i.
+			if (!isComplete()) {
+				for (int[] location : blackPieceLocations) {
+					int fromRow = location[0];
+					int fromColumn = location[1];
+					for (int toRow = 0; toRow < numRows; toRow++) {
+						for (int toColumn = 0; toColumn < numColumns; toColumn++) {
+							Move move = new Move(fromRow, fromColumn, toRow, toColumn);
+							if (isValidMove(move)) {
+								testing = true;
+								move(move);
+								if (inCheck(Player.BLACK)) {
+									undo();
+									testing = false;
+								} else {
+									testing = false;
+									return;
+								}
+							}
+						}
+					}
+				}
+			} else {
+				testing = false;
+				return;
+			}
+		}
+
+		// B.
+		Move checkMove = null;
+		for(int[] blackLocation : blackPieceLocations) {
+			int fromRow = blackLocation[0];
+			int fromColumn = blackLocation[1];
+			for(int toRow = 0; toRow < numRows; toRow++) {
+				for(int toColumn = 0; toColumn < numColumns; toColumn++) {
+					Move move = new Move(fromRow, fromColumn, toRow, toColumn);
+					if(isValidMove(move)) {
+						testing = true;
+						move(move);
+						if(inCheck(Player.WHITE)) {
+							// ii.
+							if(isComplete()) {
+								testing = false;
+								return;
+							}
+							boolean whiteCanTake = false;
+							// i.
+							for(int[] whiteLocation : whitePieceLocations) {
+								int fromRow2 = whiteLocation[0];
+								int fromColumn2 = whiteLocation[1];
+								Move move2 = new Move(fromRow2, fromColumn2, toRow, toColumn);
+								if(isValidMove(move2)) {
+									whiteCanTake = true;
+								}
+							}
+							if(whiteCanTake) {
+								undo();
+								testing = false;
+							} else {
+								undo();
+								testing = false;
+								checkMove = move;
+							}
+						} else {
+							undo();
+							testing = false;
+						}
+					}
+				}
+			}
+		}
+		if(checkMove != null) {
+			testing = false;
+			move(checkMove);
+			return;
+		}
+
+		// C.
+		// for every black piece...
+        for(int[] blackLocation : blackPieceLocations) {
+			ArrayList<Move> attackingMoves = new ArrayList<>();
+			int attackers = 0;
+			int defenders = 0;
+            int toRow = blackLocation[0];
+            int toColumn = blackLocation[1];
+            // ...count how many attackers there are
+            for(int[] attackerLocation : whitePieceLocations) {
+            	Move move = new Move(attackerLocation[0], attackerLocation[1], toRow, toColumn);
+            	if(isValidMove(move)) {
+            		attackers++;
+            		attackingMoves.add(move);
+				}
+			}
+            // and for every attacking move white has...
+            for(Move move : attackingMoves) {
+            	defenders = 0;
+            	testing = true;
+            	move(move);
+            	// ...count how many defenders there are (black pieces that could retake afterwards)
+				for(int[] defenderLocation : blackPieceLocations) {
+					if(isValidMove(new Move(defenderLocation[0], defenderLocation[1], toRow, toColumn))) {
+						defenders++;
+					}
+				}
+				undo();
+				testing = false;
+				// if there are less defenders than there are attackers, try to move the piece away
+				if(defenders < attackers) {
+					System.out.println("piece: " + pieceAt(toRow, toColumn));
+					System.out.println("attackers: " + attackers);
+					System.out.println("defenders: " + defenders);
+					for(int toRow2 = 0; toRow2 < numRows; toRow2++) {
+						for(int toColumn2 = 0; toColumn2 < numColumns; toColumn2++) {
+							Move move2 = new Move(toRow, toColumn, toRow2, toColumn2);
+							// if the piece can move away...
+							if(isValidMove(move2)) {
+								testing = true;
+								move(move2);
+								// ...recheck if white can take it
+								for(int[] whiteLocation2 : whitePieceLocations) {
+									Move move3 = new Move(whiteLocation2[0], whiteLocation2[1], toRow2, toColumn2);
+									if(isValidMove(move3)){
+										undo();
+										testing = false;
+										break;
+									}
+								}
+								// if the piece was moved without being retaken, check if it put the black king in check
+								if(testing && inCheck(Player.BLACK)) {
+									undo();
+									testing = false;
+								}
+								// if the piece was safely moved and didn't put black in check, return
+								if(testing) {
+									testing = false;
+									System.out.println("MOVED OUT OF HARM");
+									return;
+								}
+							}
+						}
+					}
+					// if there are no available places for the piece to move, try to defend it
+					for(Move move4 : attackingMoves) {
+						for(int[] blackLocation2 : blackPieceLocations) {
+							for(int toRow3 = 0; toRow3 < numRows; toRow3++) {
+								for(int toColumn3 = 0; toColumn3 < numColumns; toColumn3++) {
+									Move move5 = new Move(blackLocation2[0], blackLocation2[1], toRow3, toColumn3);
+									if(isValidMove(move5)) {
+										testing = true;
+										move(move5);
+										move(move4);
+										if(isValidMove(new Move(toRow3, toColumn3, move4.toRow, move4.toColumn))) {
+											undo();
+											testing = false;
+											System.out.println("DEFENDED WITH ANOTHER PIECE");
+											return;
+										} else {
+											undo();
+											undo();
+											testing = false;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+        }
+
+
+
+
 	}
 
 	public class MoveList{

@@ -27,7 +27,7 @@ public class Pawn extends ChessPiece {
 		if (!super.isValidMove(move, board)) return false;
 
 		if (move.fromColumn == move.toColumn) {
-			if (board[move.fromRow + direction][move.toColumn] != null)
+			if (move.fromRow + direction < 0 || board[move.fromRow + direction][move.toColumn] != null)
 				return false;
 
 			boolean isInitialMove = player() == Player.WHITE ? move.fromRow == 6 : move.fromRow == 1;

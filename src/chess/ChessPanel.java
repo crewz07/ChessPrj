@@ -304,31 +304,9 @@ public class ChessPanel extends JPanel {
                                 if ((model.isValidMove(m))) {
                                     // ...move that piece to (r, c) in the model
                                     model.move(m);
-
-                                    // if the previous player that just made that move is still in check,
-                                    // undo that move and create a pop-up notification
-                                    if(model.inCheck(model.currentPlayer().next())) {
-                                        model.undo();
-                                        JOptionPane.showMessageDialog(ChessPanel.this, (model.inCheck(model.currentPlayer()) ? "You have to make a move that gets your King out of check." : "Making that move would put your King into check."));
-                                    }
-                                    else {
-                                        displayBoard();
-                                        // if the current player was just put into check by that move...
-                                        if(model.inCheck(model.currentPlayer())) {
-                                            // ...check if the game is over...
-                                            if(model.isComplete()) {
-                                                if(JOptionPane.showConfirmDialog(ChessPanel.this, "Play again?", "Checkmate! " + (model.currentPlayer() == Player.WHITE ? "White" : "Black") + " wins!", 0) == JOptionPane.YES_OPTION) {
-                                                    while(model.moveList.size() != 0) {
-                                                        model.undo();
-                                                    }
-                                                    displayBoard();
-                                                }
-                                            // ...if it's not, create a pop-up saying "check"
-                                            } else {
-                                                JOptionPane.showMessageDialog(ChessPanel.this, "Check!");
-                                            }
-                                        }
-                                    }
+                                    displayBoard();
+                                    model.AI();
+                                    displayBoard();
                                 }
                             }
 
