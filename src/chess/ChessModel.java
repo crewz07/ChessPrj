@@ -1088,9 +1088,9 @@ public class ChessModel implements IChessModel {
         boolean looping = true;
 		while(looping) {
 			int[] pieceToMove;
-			do {
+			//do {
 				pieceToMove = blackPieceLocations.get(random.nextInt(blackPieceLocations.size()));
-			} while(blackPieceLocations.size() > 1 && pieceAt(pieceToMove[0], pieceToMove[1]) instanceof King);
+			//} while(blackPieceLocations.size() > 1 && pieceAt(pieceToMove[0], pieceToMove[1]) instanceof King);
 			piecesTried.set(blackPieceLocations.indexOf(pieceToMove), null);
 			int[] whiteKingLocation = new int[2];
 			for (int r = 0; r < numRows; r++) {
@@ -1146,8 +1146,15 @@ public class ChessModel implements IChessModel {
 				for(int c = 0; c < numColumns; c++) {
 					Move move = new Move(blackLocation[0], blackLocation[1], r, c);
 					if(isValidMove(move)) {
+						testing = true;
 						move(move);
-						return;
+						if(inCheck(Player.BLACK)) {
+							undo();
+							testing = false;
+						} else {
+							testing = false;
+							return;
+						}
 					}
 				}
 			}

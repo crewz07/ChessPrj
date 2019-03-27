@@ -539,4 +539,38 @@ public class ModelTests {
         Assert.assertEquals(Player.BLACK, chess
         .pieceAt(2, 1).player());
     }
+
+    @Test
+    public void testAI_gameStalemated() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(0, 7, new King(Player.BLACK));
+        chess.setPiece(0, 4, null);
+        chess.setPiece(0, 6, new Pawn(Player.BLACK));
+        chess.setPiece(0, 0, new Rook(Player.WHITE));
+        chess.setPiece(1, 0, new Rook(Player.WHITE));
+        chess.AI();
+        Assert.assertFalse(chess.inCheck(Player.BLACK));
+        Assert.assertNotNull(chess.pieceAt(0, 7));
+        Assert.assertEquals(0, chess.moveList.size());
+    }
+
+    @Test
+    public void testAI_canTakeEnemyPiece_withoutLosingPiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(1, 2, new Rook(Player.BLACK));
+        chess.setPiece(3, 2, new Knight(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(Player.BLACK, chess.
+        pieceAt(3, 2).player());
+        Assert.assertEquals("Rook", chess.
+        pieceAt(3, 2).type());
+        Assert.assertEquals(1, chess.moveList.size());
+    }
 }
