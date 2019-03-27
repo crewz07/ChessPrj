@@ -26,7 +26,7 @@ public class ModelTests {
         chess.setPiece(6,4,null);
         Move king = new Move(7,4,6,4);
         chess.move(king);
-        Assert.assertTrue("White King should have moved",chess.wKingMoved);
+        Assert.assertTrue("White King should move",chess.wKingMoved);
     }
 
     //Test for disabling the white king after it moves
@@ -425,6 +425,7 @@ public class ModelTests {
 //        ChessModel.MoveList move = new ChessModel.MoveList(moveCount,pieceMoved,move,enPassant)
 //    }
 
+    //Testing of the en passant functionality
     @Test
     public void testEnPassant() {
         clearBoard();
@@ -448,6 +449,7 @@ public class ModelTests {
         Assert.assertNotNull(chess.pieceAt(2, 2));
     }
 
+    //Testing undoing an en passant move
     @Test
     public void testUndo_enPassant() {
         testEnPassant();
@@ -456,6 +458,7 @@ public class ModelTests {
         Assert.assertNotNull(chess.pieceAt(3, 2));
     }
 
+    //Testing AI and check functionality
     @Test
     public void testAI_inCheck() {
         clearBoard();
@@ -477,6 +480,7 @@ public class ModelTests {
         .getPieceMoved().player() == Player.BLACK);
     }
 
+    //Testing AI can put us in check without sacrificing pieces
     @Test
     public void testAI_canPutEnemyInCheck_WithoutLosingPiece() {
         clearBoard();
@@ -489,6 +493,7 @@ public class ModelTests {
         Assert.assertEquals(1, chess.moveList.size());
     }
 
+    //Testing AI can put us in check while losing pieces
     @Test
     public void testAI_canPutEnemyInCheck_ButWillLosePiece() {
         clearBoard();
@@ -501,6 +506,7 @@ public class ModelTests {
         Assert.assertEquals(1, chess.moveList.size());
     }
 
+    //Testing AI will move a piece at risk of being taken
     @Test
     public void testAI_pieceInDanger_canMove() {
         clearBoard();
@@ -521,6 +527,7 @@ public class ModelTests {
         .pieceMoved.player());
     }
 
+    //Testing AI has to defend a piece
     @Test
     public void testAI_pieceInDanger_hasToDefend() {
         clearBoard();
@@ -540,6 +547,7 @@ public class ModelTests {
         .pieceAt(2, 1).player());
     }
 
+    //Testing AI stalemate
     @Test
     public void testAI_gameStalemated() {
         clearBoard();
@@ -557,6 +565,7 @@ public class ModelTests {
         Assert.assertEquals(0, chess.moveList.size());
     }
 
+    //Testing AI taking our pieces
     @Test
     public void testAI_canTakeEnemyPiece_withoutLosingPiece() {
         clearBoard();
