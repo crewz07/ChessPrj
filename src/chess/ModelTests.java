@@ -582,4 +582,65 @@ public class ModelTests {
         pieceAt(3, 2).type());
         Assert.assertEquals(1, chess.moveList.size());
     }
+
+    @Test
+    public void testAI_canDefendByTakingEnemyPiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(2, 1, new Pawn(Player.BLACK));
+        chess.setPiece(3, 1, new Pawn(Player.WHITE));
+        chess.setPiece(4, 7, new Rook(Player.BLACK));
+        chess.setPiece(7, 6, new Pawn(Player.WHITE));
+        chess.setPiece(4, 0, new Knight(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(Player.BLACK, chess.
+        pieceAt(4, 0).player());
+        Assert.assertEquals("Rook", chess.
+        pieceAt(4, 0).type());
+        Assert.assertEquals(1, chess.moveList.size());
+    }
+
+    @Test
+    public void testAI_canDefendByTakingEnemyPiece_butWillLosePiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(2, 1, new Pawn(Player.BLACK));
+        chess.setPiece(3, 1, new Pawn(Player.WHITE));
+        chess.setPiece(4, 7, new Rook(Player.BLACK));
+        chess.setPiece(7, 6, new Pawn(Player.WHITE));
+        chess.setPiece(4, 0, new Knight(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.setPiece(5, 1, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(Player.WHITE, chess.
+        pieceAt(4, 0).player());
+        Assert.assertEquals("Knight", chess.
+        pieceAt(4, 0).type());
+        Assert.assertEquals(1, chess.moveList.size());
+    }
+
+    @Test
+    public void testAI_canTakeEnemyPiece_butWillLosePiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(3, 1, new Pawn(Player.WHITE));
+        chess.setPiece(4, 7, new Rook(Player.BLACK));
+        chess.setPiece(7, 6, new Pawn(Player.WHITE));
+        chess.setPiece(4, 0, new Knight(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.setPiece(5, 1, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(Player.WHITE, chess.
+                pieceAt(4, 0).player());
+        Assert.assertEquals("Knight", chess.
+                pieceAt(4, 0).type());
+        Assert.assertEquals(1, chess.moveList.size());
+    }
 }

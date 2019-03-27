@@ -16,6 +16,7 @@ import java.util.Random;
 
 public class ChessModel implements IChessModel {
 	private boolean testing;
+	//private GUIcodes message;
 
 	//variables related to building the game and board
 	private IChessPiece[][] board;
@@ -566,6 +567,7 @@ public class ChessModel implements IChessModel {
 					JOptionPane.showMessageDialog(null, (inCheck(player.next()) ?
                             "You are in check." :
                             "Must move out of check"));
+
 				}
 			} else {
 				if(inCheck(Player.WHITE)) {
@@ -965,8 +967,8 @@ public class ChessModel implements IChessModel {
 			}
             // and for every attacking move white has...
             for(Move move : attackingMoves) {
-            	// ...if a black piece can take the attacking white piece without
-				// getting taken itself, do it...
+            	// ...if a black piece can take the attacking white
+				// piece without getting taken itself, do it...
             	for(int[] blackLocation2 : blackPieceLocations) {
             		Move move2 = new Move
                             (blackLocation2[0], blackLocation2[1],
@@ -1028,13 +1030,14 @@ public class ChessModel implements IChessModel {
 										break;
 									}
 								}
-								// if the piece was moved without being retaken,
-                                // check if it put the black king in check
+								// if the piece was moved without being
+								// retaken, check if it put the black king in check
 								if(testing && inCheck(Player.BLACK)) {
 									undo();
 									testing = false;
 								}
-								// if the piece was moved and didn't put black in check, return
+								// if the piece was moved and didn't
+								// put black in check, return
 								if(testing) {
 									testing = false;
 									return;
