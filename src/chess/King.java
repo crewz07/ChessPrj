@@ -7,16 +7,30 @@ public class King extends ChessPiece {
 	private int[] rowMod = new int[] {-1,0,1,1,1,0,-1,-1};
 	private int[] colMod = new int[] {-1,-1,-1,0,1,1,1,0};
 
+
+    /******************************************************************
+     * Default constructor for the King piece object
+     * @param player for the player the piece should be created for
+     *****************************************************************/
 	public King(Player player) {
 		super(player);
 
 	}
 
+    /******************************************************************
+     * Getter for a string of the piece's type
+     * @Return string "King" for the piece's type
+     *****************************************************************/
 	public String type() {
 		return "King";
 	}
 
-	//still need to add castleing
+    /******************************************************************
+     * Checks to see if the piece is making a valid move for its type
+     * @param move - the move being made
+     * @param board - where the piece is on the board
+     * @return boolean if the move is valid or not
+     *****************************************************************/
 	public boolean isValidMove(Move move, IChessPiece[][] board) {
 		boolean valid = false;
 		ArrayList<int[]> validMoves = new ArrayList<int[]>();

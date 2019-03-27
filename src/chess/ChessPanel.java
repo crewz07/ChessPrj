@@ -9,13 +9,16 @@ public class ChessPanel extends JPanel {
     private JButton[][] board;
     private ChessModel model;
 
+    //JButton objects for castling
     private JButton wCastleLeft = new JButton();
     private JButton wCastleRight = new JButton();
     private JButton bCastleLeft = new JButton();
     private JButton bCastleRight = new JButton();
 
+    //Undo JButton
     private JButton undoButton = new JButton();
 
+    //ImageIcon objects for white pieces
     private ImageIcon wRook;
     private ImageIcon wBishop;
     private ImageIcon wQueen;
@@ -23,6 +26,7 @@ public class ChessPanel extends JPanel {
     private ImageIcon wPawn;
     private ImageIcon wKnight;
 
+    //ImageIcon objects for black pieces
     private ImageIcon bRook;
     private ImageIcon bBishop;
     private ImageIcon bQueen;
@@ -30,6 +34,7 @@ public class ChessPanel extends JPanel {
     private ImageIcon bPawn;
     private ImageIcon bKnight;
 
+    //Used to move icons
     private boolean firstClickFlag;
     private int fromRow;
     private int toRow;
@@ -38,6 +43,9 @@ public class ChessPanel extends JPanel {
 
     private listener listener;
 
+    /******************************************************************
+     * Default constructor for the ChessPanel
+     *****************************************************************/
     public ChessPanel() {
         model = new ChessModel();
         board = new JButton[model.numRows()][model.numColumns()];
@@ -114,6 +122,11 @@ public class ChessPanel extends JPanel {
         firstClickFlag = true;
     }
 
+    /******************************************************************
+     * Colors alternating spaces of the chess board
+     * @param r - row of a board space to color
+     * @param c - column of a board space to color
+     *****************************************************************/
     private void setBackGroundColor(int r, int c) {
         if ((c % 2 == 1 && r % 2 == 0) || (c % 2 == 0 && r % 2 == 1)) {
             board[r][c].setBackground(Color.LIGHT_GRAY);
@@ -122,6 +135,11 @@ public class ChessPanel extends JPanel {
         }
     }
 
+    /******************************************************************
+     * Places the white pieces on the board and their buttons
+     * @param r - row of a board space to color
+     * @param c - column of a board space to color
+     *****************************************************************/
     private void placeWhitePieces(int r, int c) {
         if (model.pieceAt(r, c).type().equals("Pawn")) {
             board[r][c] = new JButton(null, wPawn);
@@ -149,6 +167,11 @@ public class ChessPanel extends JPanel {
         }
     }
 
+    /******************************************************************
+     * Places the black pieces on the board and their buttons
+     * @param r - row of a board space to color
+     * @param c - column of a board space to color
+     *****************************************************************/
     private void placeBlackPieces(int r, int c) {
         if (model.pieceAt(r, c).type().equals("Pawn")) {
             board[r][c] = new JButton(null, bPawn);
@@ -176,6 +199,9 @@ public class ChessPanel extends JPanel {
         }
     }
 
+    /******************************************************************
+     * Sets the images for the corresponding white and black pieces
+     *****************************************************************/
     private void createIcons() {
         // Sets the Image for white player pieces
         String path = "src/chess/";
@@ -193,7 +219,10 @@ public class ChessPanel extends JPanel {
         bKnight = new ImageIcon(path + "bKnight.png");
     }
 
-    // method that updates the board
+
+    /******************************************************************
+     * Method that updates and displays the game board
+     *****************************************************************/
     private void displayBoard() {
         // determine which castling buttons will be active according to the board state and current player
         //need to add that if there are pieces in the way, you can just query model class, im already doing that
@@ -255,6 +284,11 @@ public class ChessPanel extends JPanel {
 
     // inner class that represents action listener for buttons
     private class listener implements ActionListener {
+
+        /******************************************************************
+         * Method that listens for button presses and updates the game board
+         * as needed
+         *****************************************************************/
         public void actionPerformed(ActionEvent event) {
             if(event.getSource() == wCastleRight) {
                 model.moveCastle(false);

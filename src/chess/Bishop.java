@@ -5,14 +5,28 @@ import java.util.ArrayList;
 
 public class Bishop extends ChessPiece {
 
+    /******************************************************************
+     * Default constructor for the bishop piece
+     * @param player for the player the piece should be created for
+     *****************************************************************/
 	public Bishop(Player player) {
 		super(player);
 	}
 
+    /******************************************************************
+     * Getter for a string of the piece's type
+     * @Return string "Bishop" for the piece's type
+     *****************************************************************/
 	public String type() {
 		return "Bishop";
 	}
-	
+
+    /******************************************************************
+     * Checks to see if the piece is making a valid move for its type
+     * @param move - the move being made
+     * @param board - where the piece is on the board
+     * @return boolean if the move is valid or not
+     *****************************************************************/
 	public boolean isValidMove(Move move, IChessPiece[][] board) {
 
         //arrayList will hold 1 dimensional arrays with valid moves.
@@ -35,14 +49,14 @@ public class Bishop extends ChessPiece {
 	}
 
     /******************************************************************
-     * Used to populate arraylist of all possible moves a bishop can
+     * Used to populate an ArrayList of all possible moves a bishop can
      * make from its current position, adds array to array list
      * with format [row,col]
      * @param startingRow integer starting row position of bishop
      * @param startingCol integer starting col position of bishop
      * @param board double array of chess piece locations
      * @param validMoves array list to be populated with valid row/col
-     */
+     ******************************************************************/
     private void possibleMoves(int startingRow,int startingCol,
                                IChessPiece[][] board,
                                ArrayList validMoves) {

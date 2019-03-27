@@ -2,18 +2,31 @@ package chess;
 
 public class Rook extends ChessPiece {
 
+	/******************************************************************
+	 * Default constructor for the queen piece
+	 * @param player for the player the piece should be created for
+	 *****************************************************************/
 	public Rook(Player player) {
 		
 		super(player);
 	}
 
+	/******************************************************************
+	 * Getter for a string of the piece's type
+	 * @Return string "Rook" for the piece's type
+	 *****************************************************************/
 	public String type() {
 		
 		return "Rook";
 		
 	}
-	
-	// determines if the move is valid for a rook piece
+
+	/******************************************************************
+	 * Checks to see if the piece is making a valid move for its type
+	 * @param move - the move being made
+	 * @param board - where the piece is on the board
+	 * @return boolean if the move is valid or not
+	 *****************************************************************/
 	public boolean isValidMove(Move move, IChessPiece[][] board) {
 		// check the baseline rules for a valid chess piece move
 		//idk if we need to do this-ak

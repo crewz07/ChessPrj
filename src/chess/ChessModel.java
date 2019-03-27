@@ -7,11 +7,13 @@ import java.util.Random;
 public class ChessModel implements IChessModel {
 	private boolean testing;
 
+	//variables related to building the game and board
 	private IChessPiece[][] board;
 	private Player player;
 	private int numRows = 8;
 	private int numColumns = 8;
 
+	//booleans related to keeping track of castling
 	public boolean wKingMoved;
 	public boolean bKingMoved;
 	public boolean rbRookMoved;
@@ -19,6 +21,7 @@ public class ChessModel implements IChessModel {
 	public boolean rwRookMoved;
 	public boolean lwRookMoved;
 
+	//ints related to keeping track of castling
 	int ctWhiteKingMoved;
 	int ctBlackKingMoved;
 	int ctrbRookMoved;
@@ -26,17 +29,21 @@ public class ChessModel implements IChessModel {
 	int ctrwRookMoved;
 	int ctlwRookMoved;
 
+	//int and ArrayList tracking moves for the undo feature
 	public static int moveCount = 0;
 	ArrayList<MoveList>moveList = new ArrayList<>();
 
 	// declare other instance variables as needed
 
+	/******************************************************************
+	 * Default constructor for ChessModel
+	 *****************************************************************/
 	public ChessModel() {
 		board = new IChessPiece[8][8];
 		player = Player.WHITE;
 		testing = false;
 
-		// white pieces
+		// white piece creation and set up
 		board[7][0] = new Rook(Player.WHITE);
 		board[7][1] = new Knight(Player.WHITE);
 		board[7][2] = new Bishop(Player.WHITE);
@@ -49,7 +56,7 @@ public class ChessModel implements IChessModel {
 			board[6][i] = new Pawn(Player.WHITE);
 		}
 
-		// black pieces
+		// black piece creation and set up
 		board[0][0] = new Rook(Player.BLACK);
 		board[0][1] = new Knight(Player.BLACK);
 		board[0][2] = new Bishop(Player.BLACK);
@@ -75,7 +82,7 @@ public class ChessModel implements IChessModel {
 	 * to be used by gui to determine which buttons should be enabled
 	 * return array format is as follows 1 for enable 0 for disabled
 	 * [white L, white R, black L, black right]
-	 * @return int[] used to determine what push buttons to enable
+	 * @return results boolean[] to determine what push buttons to enable
 	 *****************************************************************/
 	public boolean[] castleEnable() {
 		boolean lWhiteState = false;
@@ -137,6 +144,7 @@ public class ChessModel implements IChessModel {
 				rBlackState};
 		return results;
 	}
+
 	/**************************************************************
 	 * This function is used to call the move method and castle
 	 * if the push buttons for castle are pushed if left 0, if
@@ -325,6 +333,11 @@ public class ChessModel implements IChessModel {
 		}
 	}
 
+	/******************************************************************
+	 * Method used to check if a player is in checkmate by looking at
+	 * the possible moves of every piece on the board
+	 * @return boolean, true if the player is in checkmate
+	 *****************************************************************/
 	public boolean isComplete() {
 		for(int fromRow = 0; fromRow < numRows; fromRow++) {
 			for(int fromCol = 0; fromCol < numColumns; fromCol++) {
@@ -352,6 +365,11 @@ public class ChessModel implements IChessModel {
 		return true;
 	}
 
+	/******************************************************************
+	 * Checks to see ifa piece's move is legal
+	 * @param move - an inputted move to be checked if it is valid
+	 * @return boolean on whether or not the move is legal
+	 *****************************************************************/
 	public boolean isValidMove(Move move) {
 		boolean valid = false;
 		if (board[move.fromRow][move.fromColumn] != null) {
@@ -394,6 +412,11 @@ public class ChessModel implements IChessModel {
 		return valid;
 	}
 
+	/******************************************************************
+	 * Make a piece move, with updating to the pertinent castling
+	 * values if needed, and update the moveList and moveCount
+	 * @param move - an inputted move to be made
+	 *****************************************************************/
 	public void move(Move move) {
 
 	    IChessPiece taken = null;
@@ -523,6 +546,15 @@ public class ChessModel implements IChessModel {
 		setNextPlayer();
 	}
 
+	/******************************************************************
+	 * Method to determine if an inputted player is in check, uses the
+	 * ArrayList formattedKingPositions to determine the locations of
+	 * both kings and if an opposing piece is threatening these
+	 * locations
+	 * @param p - the player to be determined if they have been placed
+	 *          into check
+	 * @return boolean on whether or not the inputted player is in check
+	 *****************************************************************/
 	public boolean inCheck(Player p) {
 
 		//find king positions returned in format:
@@ -580,31 +612,61 @@ public class ChessModel implements IChessModel {
 		return valid;
 	}
 
-
+	/******************************************************************
+	 * Getter for the current player object
+	 * @return Player of the current player
+	 *****************************************************************/
 	public Player currentPlayer() {
 		return player;
 	}
 
+	/******************************************************************
+	 * Getter for the number of rows on the board
+	 * @return int of the number of rows on the board
+	 *****************************************************************/
 	public int numRows() {
 		return numRows;
 	}
 
+	/******************************************************************
+	 * Getter for the number of columns on the board
+	 * @return int of the number of columns on the board
+	 *****************************************************************/
 	public int numColumns() {
 		return numColumns;
 	}
 
+	/******************************************************************
+	 * Getter of a chess piece at a specified location
+	 * @param row - piece at inputted row on the board
+	 * @param column - piece at inputted column on the board
+	 * @return IChessPiece of the piece at the row/column location
+	 *****************************************************************/
 	public IChessPiece pieceAt(int row, int column) {
 		return board[row][column];
 	}
 
+	/******************************************************************
+	 * Changes the active player, from black to white for vice-versa
+	 *****************************************************************/
 	public void setNextPlayer() {
 		player = player.next();
 	}
 
+	/******************************************************************
+	 * Sets a certain piece at a certain location
+	 * @param row - row of a piece
+	 * @param column - column of a piece
+	 * @param piece - IChessPiece object
+	 *****************************************************************/
 	public void setPiece(int row, int column, IChessPiece piece) {
 		board[row][column] = piece;
 	}
 
+	/******************************************************************
+	 * Undoes the last made move and updates the moveCount int and
+	 * the moveList ArrayList
+	 *****************************************************************/
 	public void undo(){
 	    if(moveCount > 0) {
             IChessPiece movedPiece;
@@ -695,12 +757,15 @@ public class ChessModel implements IChessModel {
         }
     }
 
-	//finds the location of both kings, returns array list containing
-	//an integer arrays size 2 with white king first, integer array
-	//holds[row,col]
-	//arraylist return format blackKing[row,col]
-	//						  whiteKing[row,col]
-	//have to check player color to make sure you get the one you want
+
+	/******************************************************************
+	 * Finds the location of both kings on the gameboard
+	 * ArrayList return format: blackKing[row,col]
+	 * 							 whiteKing[row,col]
+	 * 	have to check player color to make sure you get the one you want
+	 * @return array list containing an integer arrays size 2 with
+	 * white king first, integer array holds[row,col]
+	 *****************************************************************/
 	public ArrayList<int[]> findKing(){
 
 		//create arrayList
@@ -1087,12 +1152,20 @@ public class ChessModel implements IChessModel {
 	public class MoveList{
 
 
-
+		//Counter for the amount of moves taken
         int moveCount;
+
+        //IChessPiece object for the piece moved and the piece taken
 	    IChessPiece pieceMoved;
 	    IChessPiece pieceTaken;
+
 	    Move move;
 	    boolean enPassant;
+
+		/******************************************************************
+		 * The following are constructors with different parameters
+		 * for the MoveList object
+		 *****************************************************************/
 
 	    MoveList(int moveCount,IChessPiece pieceMoved, IChessPiece pieceTaken,Move move, boolean enPassant){
 	        this.moveCount = moveCount;
@@ -1123,6 +1196,11 @@ public class ChessModel implements IChessModel {
             this.move = move;
             this.enPassant = false;
         }
+
+		/******************************************************************
+		 * The following are getters for the instance variables of the
+		 * MoveLists class
+		 *****************************************************************/
 
         public int getMoveCount() {
             return moveCount;

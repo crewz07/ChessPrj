@@ -6,12 +6,19 @@ package chess;
 public class Pawn extends ChessPiece {
 	private int direction;
 
-
+	/******************************************************************
+	 * Default constructor for the pawn piece
+	 * @param player for the player the piece should be created for
+	 *****************************************************************/
 	public Pawn(Player player) {
 		super(player);
 		direction = player == Player.WHITE ? -1 : 1;
 	}
 
+	/******************************************************************
+	 * Getter for a string of the piece's type
+	 * @Return string "Pawn" for the piece's type
+	 *****************************************************************/
 	public String type() {
 		return "Pawn";
 	}
@@ -45,4 +52,3 @@ public class Pawn extends ChessPiece {
 	}
 }
 
-// still need to add en passants
