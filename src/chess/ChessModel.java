@@ -1003,7 +1003,6 @@ public class ChessModel implements IChessModel {
 								// if the piece was safely moved and didn't put black in check, return
 								if(testing) {
 									testing = false;
-									System.out.println("MOVED OUT OF HARM");
 									return;
 								}
 							}
@@ -1011,9 +1010,6 @@ public class ChessModel implements IChessModel {
 					}
 				}
 				if(defenders < attackers) {
-					System.out.println("piece: " + pieceAt(toRow, toColumn));
-					System.out.println("attackers: " + attackers);
-					System.out.println("defenders: " + defenders);
 					// if there are no available places for the piece to move, try to defend it
 					for(Move move4 : attackingMoves) {
 						for(int[] blackLocation2 : blackPieceLocations) {
@@ -1040,7 +1036,6 @@ public class ChessModel implements IChessModel {
 											}
 											// if it can't, return
 											if(testing) {
-												System.out.println("DEFENDED WITH ANOTHER PIECE");
 												testing = false;
 												return;
 											}
