@@ -1187,22 +1187,6 @@ public class ChessModel implements IChessModel {
 	        this.move = move;
 	        this.enPassant = enPassant;
         }
-
-        MoveList(int moveCount,IChessPiece pieceMoved,Move move, boolean enPassant){
-            this.moveCount = moveCount;
-            this.pieceMoved = pieceMoved;
-            this.move = move;
-            this.enPassant = enPassant;
-        }
-
-        MoveList(int moveCount,IChessPiece pieceMoved, IChessPiece pieceTaken,Move move){
-            this.moveCount = moveCount;
-            this.pieceMoved = pieceMoved;
-            this.pieceTaken = pieceTaken;
-            this.move = move;
-            this.enPassant = false;
-        }
-
         MoveList(int moveCount,IChessPiece pieceMoved,Move move){
             this.moveCount = moveCount;
             this.pieceMoved = pieceMoved;

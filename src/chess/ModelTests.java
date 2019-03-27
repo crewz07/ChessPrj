@@ -425,7 +425,118 @@ public class ModelTests {
 //        ChessModel.MoveList move = new ChessModel.MoveList(moveCount,pieceMoved,move,enPassant)
 //    }
 
+    @Test
+    public void testEnPassant() {
+        clearBoard();
+        chess.setPiece(3, 1, new Pawn(Player.WHITE));
+        chess.setPiece(1, 2, new Pawn(Player.BLACK));
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.move(new Move(1, 2, 3, 2));
+        Assert.assertTrue(chess.isValidMove(new Move(3, 1, 2, 2)));
+        chess.move(new Move(3, 1, 2, 2));
+        int count = 0;
+        for(int r = 0; r < chess.numRows(); r++) {
+            for(int c = 0; c < chess.numColumns(); c++) {
+                if(chess.pieceAt(r, c) != null) {
+                    count++;
+                }
+            }
+        }
+        Assert.assertEquals(3, count);
+        Assert.assertNotNull(chess.pieceAt(2, 2));
+    }
 
+    @Test
+    public void testUndo_enPassant() {
+        testEnPassant();
+        chess.undo();
+        Assert.assertNotNull(chess.pieceAt(3, 1));
+        Assert.assertNotNull(chess.pieceAt(3, 2));
+    }
 
+    @Test
+    public void testAI_inCheck() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(0, 0, new Rook(Player.WHITE));
+        chess.AI();
+        Assert.assertFalse(chess.inCheck(Player.BLACK));
+        Assert.assertEquals(1, chess.moveList.size());
+        Assert.assertEquals(1, chess.moveList.get(0).getMove()
+        .toRow);
+        Assert.assertTrue(Math.abs(chess.moveList.get(0)
+        .getMove().toRow - chess.moveList.get(0).getMove().fromRow) <=
+        1);
+        Assert.assertTrue(chess.moveList.get(0)
+        .getPieceMoved().type() == "King");
+        Assert.assertTrue(chess.moveList.get(0)
+        .getPieceMoved().player() == Player.BLACK);
+    }
 
+    @Test
+    public void testAI_canPutEnemyInCheck_WithoutLosingPiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(0, 0, new Rook(Player.BLACK));
+        chess.AI();
+        Assert.assertTrue(chess.inCheck(Player.WHITE));
+        Assert.assertEquals(1, chess.moveList.size());
+    }
+
+    @Test
+    public void testAI_canPutEnemyInCheck_ButWillLosePiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(0, 3, new Rook(Player.BLACK));
+        chess.AI();
+        Assert.assertFalse(chess.inCheck(Player.WHITE));
+        Assert.assertEquals(1, chess.moveList.size());
+    }
+
+    @Test
+    public void testAI_pieceInDanger_canMove() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(5, 7, new Pawn(Player.BLACK));
+        chess.setPiece(6, 6, new Knight(Player.WHITE));
+        chess.setPiece(2, 2, new Bishop(Player.BLACK));
+        chess.setPiece(4, 2, new Rook(Player.WHITE));
+        chess.setPiece(6, 3, new Pawn(Player.WHITE));
+        chess.setPiece(6, 5, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(1, chess.moveList.size());
+        Assert.assertEquals("Bishop", chess.moveList.get(0)
+        .pieceMoved.type());
+        Assert.assertEquals(Player.BLACK, chess.moveList.get(0)
+        .pieceMoved.player());
+    }
+
+    @Test
+    public void testAI_pieceInDanger_hasToDefend() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(5, 1, new Pawn(Player.WHITE));
+        chess.setPiece(3, 0, new Pawn(Player.BLACK));
+        chess.setPiece(1, 1, new Pawn(Player.BLACK));
+        chess.setPiece(3, 7, new Rook(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(1, chess.moveList.size());
+        Assert.assertNull(chess.pieceAt(1, 1));
+        Assert.assertEquals("Pawn", chess
+        .pieceAt(2, 1).type());
+        Assert.assertEquals(Player.BLACK, chess
+        .pieceAt(2, 1).player());
+    }
 }
