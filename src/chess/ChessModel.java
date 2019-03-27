@@ -357,11 +357,14 @@ public class ChessModel implements IChessModel {
 							for(int toCol = 0; toCol < numColumns; toCol++) {
 								Move move = new Move(fromRow, fromCol, toRow, toCol);
 								if(isValidMove(move)) {
+									testing = true;
 									move(move);
 									if(inCheck(player.next())) {
 										undo();
+										testing = false;
 									} else {
 										undo();
+										testing = false;
 										return false;
 									}
 								}
