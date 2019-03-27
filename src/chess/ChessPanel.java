@@ -311,6 +311,14 @@ public class ChessPanel extends JPanel {
                 displayBoard();
             }
             else if(event.getSource() == undoButton) {
+                // if the player is undoing a castling move, undo an extra time, and set the player back to white
+                // for the second undo
+                if(model.moveList.size() >= 2) {
+                    if (model.moveList.get(0).pieceMoved.player() == model.moveList.get(1).pieceMoved.player()) {
+                        model.undo();
+                        model.setNextPlayer();
+                    }
+                }
                 model.undo();
                 displayBoard();
             }
