@@ -1,3 +1,13 @@
+/******************************************************************
+ * A class for the functionality of the Pawn piece
+ *
+ * @author Andrew Kruse
+ * @author Justin Walter
+ * @author Ian Wilkewitz
+ *
+ * @version 3/26/2019
+ *****************************************************************/
+
 package chess;
 
 // right now, pawns can't take pieces, so that needs to be fixed

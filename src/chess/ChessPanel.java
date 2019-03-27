@@ -1,3 +1,13 @@
+/******************************************************************
+ * A class to display the game board and interact with it
+ *
+ * @author Andrew Kruse
+ * @author Justin Walter
+ * @author Ian Wilkewitz
+ *
+ * @version 3/26/2019
+ *****************************************************************/
+
 package chess;
 
 import java.awt.*;
@@ -224,8 +234,10 @@ public class ChessPanel extends JPanel {
      * Method that updates and displays the game board
      *****************************************************************/
     private void displayBoard() {
-        // determine which castling buttons will be active according to the board state and current player
-        //need to add that if there are pieces in the way, you can just query model class, im already doing that
+        // determine which castling buttons will be active
+        // according to the board state and current player
+        // need to add that if there are pieces in the way,
+        // you can just query model class, im already doing that
 
         //0 = lw, 1 = rw, 2 = lb, 3 = rw
         boolean[] castleEnable = model.castleEnable();
@@ -286,8 +298,8 @@ public class ChessPanel extends JPanel {
     private class listener implements ActionListener {
 
         /******************************************************************
-         * Method that listens for button presses and updates the game board
-         * as needed
+         * Method that listens for button presses and updates the
+         * game board as needed
          *****************************************************************/
         public void actionPerformed(ActionEvent event) {
             if(event.getSource() == wCastleRight) {
@@ -339,7 +351,8 @@ public class ChessPanel extends JPanel {
                                     }
                                 }
                             } else {
-                                // set the background color of the square selected on the first click back to its normal color
+                                // set the background color of the square selected
+                                // on the first click back to its normal color
                                 setBackGroundColor(fromRow, fromCol);
 
                                 toRow = r;

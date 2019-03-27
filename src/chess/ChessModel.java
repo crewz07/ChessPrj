@@ -1,3 +1,13 @@
+/******************************************************************
+ * A class for the logic and rules of the game of chess
+ *
+ * @author Andrew Kruse
+ * @author Justin Walter
+ * @author Ian Wilkewitz
+ *
+ * @version 3/26/2019
+ *****************************************************************/
+
 package chess;
 
 import javax.swing.*;

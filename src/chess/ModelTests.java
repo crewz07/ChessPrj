@@ -1,3 +1,13 @@
+/******************************************************************
+ * A class to test all of the functionality of the game of chess
+ *
+ * @author Andrew Kruse
+ * @author Justin Walter
+ * @author Ian Wilkewitz
+ *
+ * @version 3/26/2019
+ *****************************************************************/
+
 package chess;
 
 
@@ -9,6 +19,7 @@ import java.util.ArrayList;
 public class ModelTests {
     public ChessModel chess = new ChessModel();
 
+    //Test for king movement
     @Test
     public void moveKing(){
         //set piece in front of king to null
@@ -18,6 +29,7 @@ public class ModelTests {
         Assert.assertTrue("White King should have moved",chess.wKingMoved);
     }
 
+    //Test for disabling the white king after it moves
     @Test
     public void whiteKingMoveCastleDisabled(){
         boolean[] buttons = chess.castleEnable();
@@ -30,6 +42,7 @@ public class ModelTests {
 
     }
 
+    //Test the basic functionality of the kingPositions method
     @Test
     public void countKings(){
         ArrayList<int[]> kingPositions = chess.findKing();
@@ -37,6 +50,7 @@ public class ModelTests {
                 2,kingPositions.size());
     }
 
+    //Tests functionality of the formattedKingPositions ArrayList
     @Test
     public void checkKingPositions(){
         ArrayList<int[]> formattedKingPositions = chess.findKing();
@@ -46,6 +60,7 @@ public class ModelTests {
                 chess.pieceAt(blackKing[0],blackKing[1]).player());
     }
 
+    //Tests the check functionality
     @Test
     public void checkInCheck(){
 
@@ -62,6 +77,7 @@ public class ModelTests {
                 chess.inCheck(chess.currentPlayer()));
     }
 
+    //Tests to make sure king is not in check when it shouldn't be
     @Test
     public void checkNotInCheck(){
         this.setUpBoard();
@@ -69,6 +85,7 @@ public class ModelTests {
                 chess.inCheck(chess.currentPlayer()));
     }
 
+    //Test to prevent the king from not moving out of check
     @Test
     public void moveKingForwardAndBack(){
         checkInCheck();
@@ -81,6 +98,7 @@ public class ModelTests {
                  king,chess.pieceAt(5,4));
     }
 
+    //Test if the white king has moved
     @Test
     public void resetKingOnFirstMove(){
         setUpBoard();
@@ -95,19 +113,21 @@ public class ModelTests {
                 " has moved should be false",chess.wKingMoved);
     }
 
+    //Preparation for white queen side castling
     public void setUpWhiteQueenSideCastle(){
         this.setUpBoard();
         chess.setPiece(7,1,null);
         chess.setPiece(7,2,null);
         chess.setPiece(7,3,null);
     }
-
+    //Preparation for white king side castling
     public void setUpWhiteKingSideCastle(){
         setUpBoard();
         chess.setPiece(7,6,null);
         chess.setPiece(7,5,null);
     }
 
+    //Test for white king side castling
     @Test
     public void testWhiteKingSideCastle(){
         setUpWhiteKingSideCastle();
@@ -128,6 +148,7 @@ public class ModelTests {
 
     }
 
+    //Test interactions with castling and the white king in check
     @Test
     public void testWhiteKingSideCastleCheck(){
         setUpWhiteKingSideCastle();
@@ -155,12 +176,14 @@ public class ModelTests {
                 rwrook,chess.pieceAt(7,7));
     }
 
+    //Preparation for black king side castling
     public void setUpBlackKingSideCastle(){
         setUpBoard();
         chess.setPiece(0,6,null);
         chess.setPiece(0,5,null);
     }
 
+    //Test for black king side castling
     @Test
     public void kingSideBlackCastle(){
         setUpBlackQueenSideCastle();
@@ -183,6 +206,7 @@ public class ModelTests {
                 rbRook,chess.pieceAt(0,5));
     }
 
+    //Testing interactions with the black king side castling and check
     @Test
     public void testBlackKingSideCastleCheck(){
         setUpBlackKingSideCastle();
@@ -211,7 +235,7 @@ public class ModelTests {
 
     }
 
-
+    //Preparation for black queen side castling
     public void setUpBlackQueenSideCastle(){
         this.setUpBoard();
         chess.setPiece(0,1,null);
@@ -220,6 +244,7 @@ public class ModelTests {
 
     }
 
+    //Testing for black queen side castling
     @Test
     public void testBlackQueenSideCastle(){
         setUpBlackQueenSideCastle();
@@ -242,8 +267,7 @@ public class ModelTests {
                 lbRook,chess.pieceAt(0,3));
     }
 
-
-
+    //Testing interaction with castling black queen side and check
     @Test
     public void testBlackQueenSideCastleCheck(){
         setUpBlackQueenSideCastle();
@@ -271,6 +295,7 @@ public class ModelTests {
                 lwrook,chess.pieceAt(0,0));
     }
 
+    //Testing interactions with white queen side castling and check
     @Test
     public void testWhiteQueenSideCastle(){
         setUpWhiteQueenSideCastle();
@@ -291,6 +316,7 @@ public class ModelTests {
 
     }
 
+    //Test queen side white castling into check
     @Test
     public void testQueenSideWhiteCastleMoveIntoCheck(){
         setUpWhiteQueenSideCastle();
@@ -324,6 +350,7 @@ public class ModelTests {
         this.chess = new ChessModel();
     }
 
+    //Used to clear the game board (except kings) for further tests
     public void clearBoard() {
         for(int r = 0; r < 8; r++) {
             for(int c = 0; c < 8; c++) {
@@ -334,12 +361,14 @@ public class ModelTests {
         }
     }
 
+    //Test that no one is in checkmate after clearing the board
     @Test
     public void testIsComplete_notInCheck() {
         clearBoard();
         Assert.assertFalse("isComplete should return false.",chess.isComplete());
     }
 
+    //Testing that white is in check and can move out
     @Test
     public void testIsComplete_inCheckCanMoveOut() {
         clearBoard();
@@ -348,6 +377,7 @@ public class ModelTests {
         Assert.assertFalse("White should not be in checkmate", chess.isComplete());
     }
 
+    //Test that white is in checkmate
     @Test
     public void testIsComplete_inCheckmate() {
         clearBoard();
@@ -359,6 +389,7 @@ public class ModelTests {
         Assert.assertTrue("White should be in checkmate", chess.isComplete());
     }
 
+    //Test that white can take a piece to avoid checkmate
     @Test
     public void testIsComplete_inCheckCanTakePiece() {
         clearBoard();
@@ -366,6 +397,7 @@ public class ModelTests {
         Assert.assertFalse("White should not be in checkmate.", chess.isComplete());
     }
 
+    //Test that white can avoid checkmate by moving a piece to block
     @Test
     public void testIsComplete_inCheckCanBlock() {
         clearBoard();

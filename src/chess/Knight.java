@@ -74,5 +74,3 @@ public class Knight extends ChessPiece {
 	}
 
 }
-
-// this could also probably be cleaned up a lot, so i'll come back to it later

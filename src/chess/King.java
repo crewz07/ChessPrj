@@ -1,3 +1,13 @@
+/******************************************************************
+ * A class for the functionality of the King Piece
+ *
+ * @author Andrew Kruse
+ * @author Justin Walter
+ * @author Ian Wilkewitz
+ *
+ * @version 3/26/2019
+ *****************************************************************/
+
 package chess;
 
 import java.util.ArrayList;
