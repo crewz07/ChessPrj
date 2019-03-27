@@ -1078,6 +1078,7 @@ public class ChessModel implements IChessModel {
 											undo();
 											// after moving the defender into place,
                                             // check if the defender can be taken
+											/*
 											for(int[] whiteLocation : whitePieceLocations) {
 												Move move6 = new Move
 														(whiteLocation[0],
@@ -1091,6 +1092,7 @@ public class ChessModel implements IChessModel {
 													break;
 												}
 											}
+											*/
 											// if it can't, return
 											if(testing) {
 												testing = false;
