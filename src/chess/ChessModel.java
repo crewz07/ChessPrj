@@ -92,7 +92,7 @@ public class ChessModel implements IChessModel {
 	 * to be used by gui to determine which buttons should be enabled
 	 * return array format is as follows 1 for enable 0 for disabled
 	 * [white L, white R, black L, black right]
-	 * @return results boolean[] to determine what push buttons to enable
+	 * @return results boolean[] determines what push buttons to enable
 	 *****************************************************************/
 	public boolean[] castleEnable() {
 		boolean lWhiteState = false;
