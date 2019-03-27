@@ -259,9 +259,13 @@ public class ChessPanel extends JPanel {
             if(event.getSource() == wCastleRight) {
                 model.moveCastle(false);
                 displayBoard();
+                model.AI();
+                displayBoard();
             }
             else if(event.getSource() == wCastleLeft) {
                 model.moveCastle(true);
+                displayBoard();
+                model.AI();
                 displayBoard();
             }
             else if(event.getSource() == bCastleRight) {

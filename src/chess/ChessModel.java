@@ -2,6 +2,7 @@ package chess;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class ChessModel implements IChessModel {
 	private boolean testing;
@@ -740,13 +741,12 @@ public class ChessModel implements IChessModel {
 		 *		i. Move them if you can. (COMPLETE)
 		 *		ii. Attempt to protect that piece. (COMPLETE)
 		 *
-		 * D. Move a piece (pawns first) forward toward opponent king
-		 *		i. check to see if that piece is in danger of being removed, if so, move a different piece.
+		 * D. Move a piece (pawns first) forward toward opponent king (COMPLETE)
+		 *		i. check to see if that piece is in danger of being removed, if so, move a different piece. (COMPLETE)
 		 */
 
-		// maybe instead of making/undoing moves to find the best one, we
-		// could just keep track of positions and use isValidMove to check
-		// everything?
+		// will sometimes think it's moving a piece to defend, when it's actually
+		// just moving a piece that's already defending
 
 		if(currentPlayer() != Player.BLACK) {
 			return;
@@ -855,6 +855,8 @@ public class ChessModel implements IChessModel {
 			int defenders = 0;
             int toRow = blackLocation[0];
             int toColumn = blackLocation[1];
+
+
             // ...count how many attackers there are
             for(int[] attackerLocation : whitePieceLocations) {
             	Move move = new Move(attackerLocation[0], attackerLocation[1], toRow, toColumn);
@@ -865,10 +867,31 @@ public class ChessModel implements IChessModel {
 			}
             // and for every attacking move white has...
             for(Move move : attackingMoves) {
+            	// ...if a black piece can take the attacking white piece without
+				// getting taken itself, do it...
+            	for(int[] blackLocation2 : blackPieceLocations) {
+            		Move move2 = new Move(blackLocation2[0], blackLocation2[1], move.fromRow, move.fromColumn);
+            		if(isValidMove(move2)) {
+            			testing = true;
+            			move(move2);
+            			for(int[] whiteLocation : whitePieceLocations) {
+            				Move move3 = new Move(whiteLocation[0], whiteLocation[1], move.fromRow, move.fromColumn);
+            				if(isValidMove(move3)) {
+								undo();
+								testing = false;
+								break;
+							}
+						}
+            			if(testing) {
+            				testing = false;
+            				return;
+						}
+					}
+				}
             	defenders = 0;
             	testing = true;
             	move(move);
-            	// ...count how many defenders there are (black pieces that could retake afterwards)
+            	// ...if not, count how many defenders there are (black pieces that could retake afterwards) on the attacked piece
 				for(int[] defenderLocation : blackPieceLocations) {
 					if(isValidMove(new Move(defenderLocation[0], defenderLocation[1], toRow, toColumn))) {
 						defenders++;
@@ -877,11 +900,8 @@ public class ChessModel implements IChessModel {
 				undo();
 				testing = false;
 				// if there are less defenders than there are attackers, try to move the piece away
-				if(defenders < attackers) {
-					System.out.println("piece: " + pieceAt(toRow, toColumn));
-					System.out.println("attackers: " + attackers);
-					System.out.println("defenders: " + defenders);
-					for(int toRow2 = 0; toRow2 < numRows; toRow2++) {
+				if(attackers > 0) {
+					for(int toRow2 = numRows - 1; toRow2 > 0; toRow2--) {
 						for(int toColumn2 = 0; toColumn2 < numColumns; toColumn2++) {
 							Move move2 = new Move(toRow, toColumn, toRow2, toColumn2);
 							// if the piece can move away...
@@ -911,21 +931,41 @@ public class ChessModel implements IChessModel {
 							}
 						}
 					}
+				}
+				if(defenders < attackers) {
+					System.out.println("piece: " + pieceAt(toRow, toColumn));
+					System.out.println("attackers: " + attackers);
+					System.out.println("defenders: " + defenders);
 					// if there are no available places for the piece to move, try to defend it
 					for(Move move4 : attackingMoves) {
 						for(int[] blackLocation2 : blackPieceLocations) {
 							for(int toRow3 = 0; toRow3 < numRows; toRow3++) {
 								for(int toColumn3 = 0; toColumn3 < numColumns; toColumn3++) {
+									// defending move
 									Move move5 = new Move(blackLocation2[0], blackLocation2[1], toRow3, toColumn3);
 									if(isValidMove(move5)) {
 										testing = true;
 										move(move5);
 										move(move4);
-										if(isValidMove(new Move(toRow3, toColumn3, move4.toRow, move4.toColumn))) {
+										// check if the defender can take back
+										if(isValidMove(new Move(move5.toRow, move5.toColumn, move4.toRow, move4.toColumn))) {
 											undo();
-											testing = false;
-											System.out.println("DEFENDED WITH ANOTHER PIECE");
-											return;
+											// after moving the defender into place, check if the defender can be taken
+											for(int[] whiteLocation : whitePieceLocations) {
+												Move move6 = new Move(whiteLocation[0], whiteLocation[1], move5.toRow, move5.toColumn);
+												// if it can, undo the move
+												if(isValidMove(move6)) {
+													undo();
+													testing = false;
+													break;
+												}
+											}
+											// if it can't, return
+											if(testing) {
+												System.out.println("DEFENDED WITH ANOTHER PIECE");
+												testing = false;
+												return;
+											}
 										} else {
 											undo();
 											undo();
@@ -935,14 +975,113 @@ public class ChessModel implements IChessModel {
 								}
 							}
 						}
+
+
+
 					}
 				}
 			}
         }
 
+        // if a piece can be taken without the black piece being taken back, do it
+        for(int[] whiteLocation : whitePieceLocations) {
+        	for(int[] blackLocation : blackPieceLocations) {
+        		Move move = new Move(blackLocation[0], blackLocation[1], whiteLocation[0], whiteLocation[1]);
+        		if(isValidMove(move)) {
+        			testing = true;
+        			move(move);
+        			for(int[] whiteLocation2 : whitePieceLocations) {
+        				Move move2 = new Move(whiteLocation2[0], whiteLocation2[1], whiteLocation[0], whiteLocation[1]);
+        				if(isValidMove(move2)) {
+        					undo();
+        					testing = false;
+        					break;
+						}
+					}
+        			if(testing) {
+        				testing = false;
+        				return;
+					}
+				}
+			}
+		}
 
+        // D.
+		Random random = new Random();
+		ArrayList<int[]> piecesTried = new ArrayList<>();
+        for(int i = 0; i < blackPieceLocations.size(); i++) {
+        	piecesTried.add(blackPieceLocations.get(i).clone());
+		}
+        boolean looping = true;
+		while(looping) {
+			int[] pieceToMove;
+			do {
+				pieceToMove = blackPieceLocations.get(random.nextInt(blackPieceLocations.size()));
+			} while(blackPieceLocations.size() > 1 && pieceAt(pieceToMove[0], pieceToMove[1]) instanceof King);
+			piecesTried.set(blackPieceLocations.indexOf(pieceToMove), null);
+			int[] whiteKingLocation = new int[2];
+			for (int r = 0; r < numRows; r++) {
+				for (int c = 0; c < numColumns; c++) {
+					if (board[r][c] instanceof King) {
+						if (board[r][c].player() == Player.WHITE) {
+							whiteKingLocation[0] = r;
+							whiteKingLocation[1] = c;
+						}
+					}
+				}
+			}
+			for (int r = numRows - 1; r > 0; r--) {
+				for (int c = 0; c < numColumns; c++) {
+					Move move = new Move(pieceToMove[0], pieceToMove[1], r, c);
+					if (isValidMove(move)) {
+						if (Math.abs(whiteKingLocation[0] - r) < Math.abs(whiteKingLocation[0] - pieceToMove[0])) {
+							testing = true;
+							move(move);
+							// if a white piece can take it after moving it
+							for(int[] whiteLocation : whitePieceLocations) {
+								Move move2 = new Move(whiteLocation[0], whiteLocation[1], r, c);
+								if(isValidMove(move2)) {
+									undo();
+									testing = false;
+									break;
+								}
+							}
+							// if that move put the black king in check
+							if(testing && inCheck(Player.BLACK)) {
+								undo();
+								testing = false;
+							}
+							if(testing) {
+								testing = false;
+								return;
+							}
+						}
+					}
+				}
+			}
+			for(int[] element : piecesTried) {
+				looping = false;
+				if(element != null) {
+					looping = true;
+				}
+			}
+		}
 
+		// if no moves have been made up until this point, just make any available one
+		for(int[] blackLocation : blackPieceLocations) {
+			for(int r = numRows - 1; r > 0; r--) {
+				for(int c = 0; c < numColumns; c++) {
+					Move move = new Move(blackLocation[0], blackLocation[1], r, c);
+					if(isValidMove(move)) {
+						move(move);
+						return;
+					}
+				}
+			}
+		}
 
+		// if there are NO available moves the computer can make, the game stalemated
+		JOptionPane.showMessageDialog(null, "The game stalemated. :^(");
 	}
 
 	public class MoveList{
