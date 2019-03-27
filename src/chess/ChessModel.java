@@ -908,6 +908,12 @@ public class ChessModel implements IChessModel {
 						testing = true;
 						move(move);
 						if(inCheck(Player.WHITE)) {
+							// undoes the move if the AI tried to put
+							// the white king into check with its own
+							// king
+							if(inCheck(Player.BLACK)) {
+								undo();
+							}
 							// ii.
 							if(isComplete()) {
 								testing = false;
