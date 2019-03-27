@@ -405,6 +405,27 @@ public class ModelTests {
         Assert.assertFalse("White should not be in checkmate", chess.isComplete());
     }
 
+    //Test getters
+    @Test
+    public void numOfRowNumOfCols(){
+        Assert.assertEquals("Num of rows should be 8",
+                8,chess.numRows());
+    }
+    @Test
+    public void NumOfCols(){
+        Assert.assertEquals("Num of rows should be 8",
+                8,chess.numColumns());
+    }
+
+//    @Test
+//    public void MoveListConstructor2(){
+//        int moveCount = 12;
+//        IChessPiece pieceMoved = new King(Player.BLACK);
+//        move(0,0,)
+//        ChessModel.MoveList move = new ChessModel.MoveList(moveCount,pieceMoved,move,enPassant)
+//    }
+
+
 
 
 }
