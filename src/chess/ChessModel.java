@@ -565,8 +565,8 @@ public class ChessModel implements IChessModel {
 				if(inCheck(Player.WHITE)) {
 					undo();
 					JOptionPane.showMessageDialog(null, (inCheck(player.next()) ?
-                            "You are in check." :
-                            "Must move out of check"));
+                            "You have to move out of check." :
+                            "That move would put you in check."));
 
 				}
 			} else {
