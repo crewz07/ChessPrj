@@ -53,6 +53,8 @@ public class ChessPanel extends JPanel {
 
     private listener listener;
 
+    private boolean useAI;
+
     /******************************************************************
      * Default constructor for the ChessPanel
      *****************************************************************/
@@ -60,6 +62,13 @@ public class ChessPanel extends JPanel {
         model = new ChessModel();
         board = new JButton[model.numRows()][model.numColumns()];
         listener = new listener();
+        if(JOptionPane.showConfirmDialog(this,
+        "Play vs the AI?", "Chess",
+        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            useAI = true;
+        } else {
+            useAI = false;
+        }
         createIcons();
         setLayout(new GridBagLayout());
 
@@ -307,14 +316,18 @@ public class ChessPanel extends JPanel {
             if(event.getSource() == wCastleRight) {
                 model.moveCastle(false);
                 displayBoard();
-                model.AI();
-                displayBoard();
+                if(useAI) {
+                    model.AI();
+                    displayBoard();
+                }
             }
             else if(event.getSource() == wCastleLeft) {
                 model.moveCastle(true);
                 displayBoard();
-                model.AI();
-                displayBoard();
+                if(useAI) {
+                    model.AI();
+                    displayBoard();
+                }
             }
             else if(event.getSource() == bCastleRight) {
                 model.moveCastle(false);
@@ -370,8 +383,10 @@ public class ChessPanel extends JPanel {
                                     // ...move that piece to (r, c) in the model
                                     model.move(m);
                                     displayBoard();
-                                    model.AI();
-                                    displayBoard();
+                                    if(useAI) {
+                                        model.AI();
+                                        displayBoard();
+                                    }
                                 }
                             }
 
