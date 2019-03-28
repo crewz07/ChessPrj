@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class ChessModel implements IChessModel {
 	private boolean testing;
-	//private GUIcodes message;
+	public GUIcodes message;
 
 	//variables related to building the game and board
 	private IChessPiece[][] board;
@@ -53,6 +53,7 @@ public class ChessModel implements IChessModel {
 		board = new IChessPiece[8][8];
 		player = Player.WHITE;
 		testing = false;
+		message = GUIcodes.NoMessage;
 
 		// white piece creation and set up
 		board[7][0] = new Rook(Player.WHITE);
@@ -362,6 +363,9 @@ public class ChessModel implements IChessModel {
 	 * @return boolean, true if the player is in checkmate
 	 *****************************************************************/
 	public boolean isComplete() {
+		if(!inCheck(player)) {
+			return false;
+		}
 		for(int fromRow = 0; fromRow < numRows; fromRow++) {
 			for(int fromCol = 0; fromCol < numColumns; fromCol++) {
 				if(board[fromRow][fromCol] != null) {
@@ -371,7 +375,8 @@ public class ChessModel implements IChessModel {
 								toCol < numColumns; toCol++) {
 								Move move = new Move
 										(fromRow, fromCol, toRow, toCol);
-								if(isValidMove(move)) {
+								if(isValidMove(move) && !(pieceAt(toRow,
+								toCol) instanceof King)) {
 									testing = true;
 									move(move);
 									if(inCheck(player.next())) {
@@ -389,8 +394,9 @@ public class ChessModel implements IChessModel {
 				}
 			}
 		}
-		JOptionPane.showMessageDialog
-				(null, "Checkmate! " + player.next() + " wins!");
+		//JOptionPane.showMessageDialog
+				//(null, "Checkmate! " + player.next() + " wins!");
+        //testing = false;
 		return true;
 	}
 
@@ -559,24 +565,22 @@ public class ChessModel implements IChessModel {
         else
             moveList.add(0,aMove);
 
-        if(!testing) {
-			if(player == Player.WHITE) {
-
-				if(inCheck(Player.WHITE)) {
-					undo();
-					JOptionPane.showMessageDialog(null, (inCheck(player.next()) ?
-                            "You have to move out of check." :
-                            "That move would put you in check."));
-
-				}
-			} else {
-				if(inCheck(Player.WHITE)) {
-					JOptionPane.showMessageDialog(null, "Check!");
-				}
-			}
-		}
-
 		setNextPlayer();
+
+        if(!testing) {
+            if(isComplete()) {
+                JOptionPane.showMessageDialog(null,
+				"Checkmate! " + player.next() + " wins!");
+            } else if(inCheck(player)) {
+					JOptionPane.showMessageDialog(null,
+					"Check!");
+            } else if(inCheck(player.next())) {
+                undo();
+                JOptionPane.showMessageDialog(null,
+				(inCheck(player) ? "You have to move out of check."
+				: "That move would put you in check."));
+            }
+		}
 	}
 
 	/******************************************************************
@@ -868,6 +872,40 @@ public class ChessModel implements IChessModel {
 
 		// A.
 		if(inCheck(Player.BLACK)) {
+			for(int[] whiteLocation : whitePieceLocations) {
+				for(int[] blackLocation : blackPieceLocations) {
+					Move move = new Move
+							(blackLocation[0],
+									blackLocation[1],
+									whiteLocation[0],
+									whiteLocation[1]);
+					if(isValidMove(move)) {
+						testing = true;
+						move(move);
+						if(inCheck(Player.BLACK)) {
+							undo();
+							testing = false;
+						} else {
+							for (int[] whiteLocation2 : whitePieceLocations) {
+								Move move2 = new Move
+										(whiteLocation2[0],
+												whiteLocation2[1],
+												whiteLocation[0],
+												whiteLocation[1]);
+								if (isValidMove(move2)) {
+									undo();
+									testing = false;
+									break;
+								}
+							}
+							if (testing) {
+								testing = false;
+								return;
+							}
+						}
+					}
+				}
+			}
 			// i.
 			if (!isComplete()) {
 				for (int[] location : blackPieceLocations) {
@@ -891,6 +929,7 @@ public class ChessModel implements IChessModel {
 					}
 				}
 			} else {
+				// no need to try any moves if black is checkmated
 				testing = false;
 				return;
 			}
@@ -913,29 +952,34 @@ public class ChessModel implements IChessModel {
 							// king
 							if(inCheck(Player.BLACK)) {
 								undo();
-							}
-							// ii.
-							if(isComplete()) {
-								testing = false;
-								return;
-							}
-							boolean whiteCanTake = false;
-							// i.
-							for(int[] whiteLocation : whitePieceLocations) {
-								int fromRow2 = whiteLocation[0];
-								int fromColumn2 = whiteLocation[1];
-								Move move2 = new Move(fromRow2, fromColumn2, toRow, toColumn);
-								if(isValidMove(move2)) {
-									whiteCanTake = true;
-								}
-							}
-							if(whiteCanTake) {
-								undo();
 								testing = false;
 							} else {
-								undo();
-								testing = false;
-								checkMove = move;
+								// ii.
+								if (isComplete()) {
+									testing = false;
+									// remake the move in order to get the notification
+									undo();
+									move(move);
+									return;
+								}
+								boolean whiteCanTake = false;
+								// i.
+								for (int[] whiteLocation : whitePieceLocations) {
+									int fromRow2 = whiteLocation[0];
+									int fromColumn2 = whiteLocation[1];
+									Move move2 = new Move(fromRow2, fromColumn2, toRow, toColumn);
+									if (isValidMove(move2)) {
+										whiteCanTake = true;
+									}
+								}
+								if (whiteCanTake) {
+									undo();
+									testing = false;
+								} else {
+									undo();
+									testing = false;
+									checkMove = move;
+								}
 							}
 						} else {
 							undo();
@@ -956,7 +1000,7 @@ public class ChessModel implements IChessModel {
         for(int[] blackLocation : blackPieceLocations) {
 			ArrayList<Move> attackingMoves = new ArrayList<>();
 			int attackers = 0;
-			int defenders = 0;
+			int defenders;
             int toRow = blackLocation[0];
             int toColumn = blackLocation[1];
 
@@ -982,20 +1026,25 @@ public class ChessModel implements IChessModel {
             		if(isValidMove(move2)) {
             			testing = true;
             			move(move2);
-            			for(int[] whiteLocation : whitePieceLocations) {
-            				Move move3 = new Move
-                                    (whiteLocation[0], whiteLocation[1],
-                                            move.fromRow,
-                                            move.fromColumn);
-            				if(isValidMove(move3)) {
-								undo();
-								testing = false;
-								break;
-							}
-						}
-            			if(testing) {
+            			if(inCheck(Player.BLACK)) {
+            				undo();
             				testing = false;
-            				return;
+						} else {
+							for (int[] whiteLocation :
+							whitePieceLocations) {
+								Move move3 = new Move(whiteLocation[0],
+								whiteLocation[1], move.fromRow,
+								move.fromColumn);
+								if (isValidMove(move3)) {
+									undo();
+									testing = false;
+									break;
+								}
+							}
+							if (testing) {
+								testing = false;
+								return;
+							}
 						}
 					}
 				}
@@ -1037,7 +1086,8 @@ public class ChessModel implements IChessModel {
 									}
 								}
 								// if the piece was moved without being
-								// retaken, check if it put the black king in check
+								// retaken, check if it put the black
+								// king in check
 								if(testing && inCheck(Player.BLACK)) {
 									undo();
 									testing = false;
@@ -1053,8 +1103,8 @@ public class ChessModel implements IChessModel {
 					}
 				}
 				if(defenders < attackers) {
-					// if there are no available places for the piece to move,
-                    // try to defend it
+					// if there are no available places for the piece
+					// to move, try to defend it
 					for(Move move4 : attackingMoves) {
 						for(int[] blackLocation2 : blackPieceLocations) {
 							for(int toRow3 = 0; toRow3 < numRows; toRow3++) {
@@ -1076,9 +1126,11 @@ public class ChessModel implements IChessModel {
                                                                 move4.toRow,
                                                                 move4.toColumn))) {
 											undo();
-											// after moving the defender into place,
-                                            // check if the defender can be taken
-											/*
+											// after moving the defender
+											// into place, check if the
+											// defender can be taken
+											// by a pawn
+
 											for(int[] whiteLocation : whitePieceLocations) {
 												Move move6 = new Move
 														(whiteLocation[0],
@@ -1086,15 +1138,19 @@ public class ChessModel implements IChessModel {
 																move5.toRow,
 																move5.toColumn);
 												// if it can, undo the move
-												if(isValidMove(move6)) {
-													undo();
-													testing = false;
-													break;
+												if(pieceAt(whiteLocation[0], whiteLocation[1]).type() == "Pawn") {
+													if (isValidMove(move6)) {
+														undo();
+														testing = false;
+														break;
+													}
 												}
 											}
-											*/
-											// if it can't, return
-											if(testing) {
+
+											if(inCheck(Player.BLACK)) {
+												undo();
+												testing = false;
+											} else if(testing) {
 												testing = false;
 												return;
 											}
@@ -1115,7 +1171,8 @@ public class ChessModel implements IChessModel {
 			}
         }
 
-        // if a piece can be taken without the black piece being taken back, do it
+        // if a piece can be taken without the black piece being taken
+		// back, do it
         for(int[] whiteLocation : whitePieceLocations) {
         	for(int[] blackLocation : blackPieceLocations) {
         		Move move = new Move
@@ -1126,21 +1183,26 @@ public class ChessModel implements IChessModel {
         		if(isValidMove(move)) {
         			testing = true;
         			move(move);
-        			for(int[] whiteLocation2 : whitePieceLocations) {
-        				Move move2 = new Move
-								(whiteLocation2[0],
-										whiteLocation2[1],
-										whiteLocation[0],
-										whiteLocation[1]);
-        				if(isValidMove(move2)) {
-        					undo();
-        					testing = false;
-        					break;
-						}
-					}
-        			if(testing) {
+        			if(inCheck(Player.BLACK)) {
+        				undo();
         				testing = false;
-        				return;
+					} else {
+						for (int[] whiteLocation2 : whitePieceLocations) {
+							Move move2 = new Move
+									(whiteLocation2[0],
+											whiteLocation2[1],
+											whiteLocation[0],
+											whiteLocation[1]);
+							if (isValidMove(move2)) {
+								undo();
+								testing = false;
+								break;
+							}
+						}
+						if (testing) {
+							testing = false;
+							return;
+						}
 					}
 				}
 			}
@@ -1210,7 +1272,38 @@ public class ChessModel implements IChessModel {
 			}
 		}
 
-		// if no moves have been made, just make any available one
+		// if no moves have been made, just make any available one that
+		// doesn't put the piece in danger
+		for(int[] blackLocation : blackPieceLocations) {
+			for(int r = numRows - 1; r > 0; r--) {
+				for(int c = 0; c < numColumns; c++) {
+					Move move = new Move(blackLocation[0], blackLocation[1], r, c);
+					if(isValidMove(move)) {
+						testing = true;
+						move(move);
+						if(inCheck(Player.BLACK)) {
+							undo();
+							testing = false;
+						} else {
+							for(int[] whiteLocation : whitePieceLocations) {
+								if(isValidMove(new Move(whiteLocation[0],
+								whiteLocation[1], r, c))) {
+									undo();
+									testing = false;
+									break;
+								}
+							}
+						}
+						if(testing) {
+							testing = false;
+							return;
+						}
+					}
+				}
+			}
+		}
+
+		// if it cant, just make any move
 		for(int[] blackLocation : blackPieceLocations) {
 			for(int r = numRows - 1; r > 0; r--) {
 				for(int c = 0; c < numColumns; c++) {
@@ -1230,7 +1323,8 @@ public class ChessModel implements IChessModel {
 			}
 		}
 
-		// if there are NO available moves the computer can make, the game stalemated
+		// if there are NO available moves the computer can make, the
+		// game stalemated
 		JOptionPane.showMessageDialog
 				(null, "The game stalemated. :^(");
 	}
