@@ -417,14 +417,6 @@ public class ModelTests {
                 8,chess.numColumns());
     }
 
-//    @Test
-//    public void MoveListConstructor2(){
-//        int moveCount = 12;
-//        IChessPiece pieceMoved = new King(Player.BLACK);
-//        move(0,0,)
-//        ChessModel.MoveList move = new ChessModel.MoveList(moveCount,pieceMoved,move,enPassant)
-//    }
-
     @Test
     public void testEnPassant() {
         clearBoard();
