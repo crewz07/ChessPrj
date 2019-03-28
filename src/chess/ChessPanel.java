@@ -64,7 +64,9 @@ public class ChessPanel extends JPanel {
         setLayout(new GridBagLayout());
 
         JPanel boardpanel = new JPanel();
-        boardpanel.setLayout(new GridLayout(model.numRows(), model.numColumns(), 1, 1));
+        boardpanel.setLayout
+                (new GridLayout
+                        (model.numRows(), model.numColumns(), 1, 1));
 
         for (int r = 0; r < model.numRows(); r++) {
             for (int c = 0; c < model.numColumns(); c++) {
@@ -323,10 +325,13 @@ public class ChessPanel extends JPanel {
                 displayBoard();
             }
             else if(event.getSource() == undoButton) {
-                // if the player is undoing a castling move, undo an extra time, and set the player back to white
+                // if the player is undoing a castling move,
+                // undo an extra time,
+                // and set the player back to white
                 // for the second undo
                 if(model.moveList.size() >= 2) {
-                    if (model.moveList.get(0).pieceMoved.player() == model.moveList.get(1).pieceMoved.player()) {
+                    if (model.moveList.get(0).pieceMoved.player() ==
+                            model.moveList.get(1).pieceMoved.player()){
                         model.undo();
                         model.setNextPlayer();
                     }
@@ -343,7 +348,8 @@ public class ChessPanel extends JPanel {
                                 // ...and if there's a piece at (r, c)...
                                 if (model.pieceAt(r, c) != null) {
                                     // ...and if that piece belongs to the current player...
-                                    if (model.pieceAt(r, c).player() == model.currentPlayer()) {
+                                    if (model.pieceAt(r, c).player() ==
+                                            model.currentPlayer()) {
                                         board[r][c].setBackground(Color.PINK);
                                         fromRow = r;
                                         fromCol = c;

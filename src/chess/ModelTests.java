@@ -26,7 +26,7 @@ public class ModelTests {
         chess.setPiece(6,4,null);
         Move king = new Move(7,4,6,4);
         chess.move(king);
-        Assert.assertTrue("White King should have moved",chess.wKingMoved);
+        Assert.assertTrue("White King should move",chess.wKingMoved);
     }
 
     //Test for disabling the white king after it moves
@@ -417,6 +417,15 @@ public class ModelTests {
                 8,chess.numColumns());
     }
 
+//    @Test
+//    public void MoveListConstructor2(){
+//        int moveCount = 12;
+//        IChessPiece pieceMoved = new King(Player.BLACK);
+//        move(0,0,)
+//        ChessModel.MoveList move = new ChessModel.MoveList(moveCount,pieceMoved,move,enPassant)
+//    }
+
+    //Testing of the en passant functionality
     @Test
     public void testEnPassant() {
         clearBoard();
@@ -440,6 +449,7 @@ public class ModelTests {
         Assert.assertNotNull(chess.pieceAt(2, 2));
     }
 
+    //Testing undoing an en passant move
     @Test
     public void testUndo_enPassant() {
         testEnPassant();
@@ -448,6 +458,7 @@ public class ModelTests {
         Assert.assertNotNull(chess.pieceAt(3, 2));
     }
 
+    //Testing AI and check functionality
     @Test
     public void testAI_inCheck() {
         clearBoard();
@@ -469,6 +480,7 @@ public class ModelTests {
         .getPieceMoved().player() == Player.BLACK);
     }
 
+    //Testing AI can put us in check without sacrificing pieces
     @Test
     public void testAI_canPutEnemyInCheck_WithoutLosingPiece() {
         clearBoard();
@@ -481,6 +493,7 @@ public class ModelTests {
         Assert.assertEquals(1, chess.moveList.size());
     }
 
+    //Testing AI can put us in check while losing pieces
     @Test
     public void testAI_canPutEnemyInCheck_ButWillLosePiece() {
         clearBoard();
@@ -493,6 +506,7 @@ public class ModelTests {
         Assert.assertEquals(1, chess.moveList.size());
     }
 
+    //Testing AI will move a piece at risk of being taken
     @Test
     public void testAI_pieceInDanger_canMove() {
         clearBoard();
@@ -513,6 +527,7 @@ public class ModelTests {
         .pieceMoved.player());
     }
 
+    //Testing AI has to defend a piece
     @Test
     public void testAI_pieceInDanger_hasToDefend() {
         clearBoard();
@@ -530,5 +545,102 @@ public class ModelTests {
         .pieceAt(2, 1).type());
         Assert.assertEquals(Player.BLACK, chess
         .pieceAt(2, 1).player());
+    }
+
+    //Testing AI stalemate
+    @Test
+    public void testAI_gameStalemated() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(0, 7, new King(Player.BLACK));
+        chess.setPiece(0, 4, null);
+        chess.setPiece(0, 6, new Pawn(Player.BLACK));
+        chess.setPiece(0, 0, new Rook(Player.WHITE));
+        chess.setPiece(1, 0, new Rook(Player.WHITE));
+        chess.AI();
+        Assert.assertFalse(chess.inCheck(Player.BLACK));
+        Assert.assertNotNull(chess.pieceAt(0, 7));
+        Assert.assertEquals(0, chess.moveList.size());
+    }
+
+    //Testing AI taking our pieces
+    @Test
+    public void testAI_canTakeEnemyPiece_withoutLosingPiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(1, 2, new Rook(Player.BLACK));
+        chess.setPiece(3, 2, new Knight(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(Player.BLACK, chess.
+        pieceAt(3, 2).player());
+        Assert.assertEquals("Rook", chess.
+        pieceAt(3, 2).type());
+        Assert.assertEquals(1, chess.moveList.size());
+    }
+
+    @Test
+    public void testAI_canDefendByTakingEnemyPiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(2, 1, new Pawn(Player.BLACK));
+        chess.setPiece(3, 1, new Pawn(Player.WHITE));
+        chess.setPiece(4, 7, new Rook(Player.BLACK));
+        chess.setPiece(7, 6, new Pawn(Player.WHITE));
+        chess.setPiece(4, 0, new Knight(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(Player.BLACK, chess.
+        pieceAt(4, 0).player());
+        Assert.assertEquals("Rook", chess.
+        pieceAt(4, 0).type());
+        Assert.assertEquals(1, chess.moveList.size());
+    }
+
+    @Test
+    public void testAI_canDefendByTakingEnemyPiece_butWillLosePiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(2, 1, new Pawn(Player.BLACK));
+        chess.setPiece(3, 1, new Pawn(Player.WHITE));
+        chess.setPiece(4, 7, new Rook(Player.BLACK));
+        chess.setPiece(7, 6, new Pawn(Player.WHITE));
+        chess.setPiece(4, 0, new Knight(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.setPiece(5, 1, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(Player.WHITE, chess.
+        pieceAt(4, 0).player());
+        Assert.assertEquals("Knight", chess.
+        pieceAt(4, 0).type());
+        Assert.assertEquals(1, chess.moveList.size());
+    }
+
+    @Test
+    public void testAI_canTakeEnemyPiece_butWillLosePiece() {
+        clearBoard();
+        if(chess.currentPlayer() != Player.BLACK) {
+            chess.setNextPlayer();
+        }
+        chess.setPiece(3, 1, new Pawn(Player.WHITE));
+        chess.setPiece(4, 7, new Rook(Player.BLACK));
+        chess.setPiece(7, 6, new Pawn(Player.WHITE));
+        chess.setPiece(4, 0, new Knight(Player.WHITE));
+        chess.setPiece(6, 4, new Pawn(Player.WHITE));
+        chess.setPiece(5, 1, new Pawn(Player.WHITE));
+        chess.AI();
+        Assert.assertEquals(Player.WHITE, chess.
+                pieceAt(4, 0).player());
+        Assert.assertEquals("Knight", chess.
+                pieceAt(4, 0).type());
+        Assert.assertEquals(1, chess.moveList.size());
     }
 }
